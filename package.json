@@ -1,0 +1,17 @@
+{
+  "name": "lifecycle",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Ariel Gerstein <ariel.gers@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel serve ./src/index.html",
+    "build": "parcel build ./src/index.html"
+  },
+  "devDependencies": {
+    "parcel": "^2.0.0-beta.3.1"
+  },
+  "dependencies": {
+    "phaser": "^3.55.2"
+  }
+}
