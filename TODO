@@ -1,2 +1,8 @@
-[] Move player using keyboard
-[] Change animations based on player position
+TODO: 
+[OK] Move player using keyboard
+[OK] Add ESLINT and Prettier config for server folder
+[] Multiplayer
+    [] Add initial socket.io implementation
+    [] Handle user connecting to the server
+    [] Handle user movement
+    [] Handle user disconnection
