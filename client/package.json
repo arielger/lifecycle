@@ -5,8 +5,8 @@
   "author": "Ariel Gerstein <ariel.gers@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "parcel serve ./src/client/index.html",
-    "build": "parcel build ./src/client/index.html",
+    "start": "parcel serve ./src/index.html",
+    "build": "parcel build ./src/index.html",
     "eslint": "eslint './src'"
   },
   "devDependencies": {
