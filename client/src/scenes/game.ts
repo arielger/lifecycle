@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import { io } from "socket.io-client";
 
+import { SocketEventNames } from "../../../server/src/types";
+
 import playerSprite from "url:../assets/characters/player.png";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -19,14 +21,14 @@ export default class GameScene extends Phaser.Scene {
     super(sceneConfig);
   }
 
-  public preload() {
+  public preload(): void {
     this.player = this.load.spritesheet("player", playerSprite, {
       frameWidth: 16,
       frameHeight: 32,
     });
   }
 
-  public create() {
+  public create(): void {
     this.players = this.physics.add.group();
 
     // @TODO: Replace with production URL after deploying
@@ -36,18 +38,28 @@ export default class GameScene extends Phaser.Scene {
       console.log("Socket connected!");
     });
 
-    this.socket.on("currentPlayers", (players) => {
+    this.socket.on(SocketEventNames.AllPlayers, (players) => {
       console.log("currentPlayers", players);
       players.forEach((player) => renderPlayer(this, player));
     });
 
-    this.socket.on("newPlayer", (player) => {
-      console.log("newPlayer", player);
+    this.socket.on(SocketEventNames.PlayerConnected, (player) => {
+      console.log("playerConnected", player);
       renderPlayer(this, player);
+    });
+
+    this.socket.on(SocketEventNames.PlayerDisconnected, (playerId) => {
+      this.players.getChildren().forEach((player) => {
+        if (player.id === playerId) {
+          player.destroy();
+        }
+      });
     });
   }
 
-  public update() {}
+  public update(): void {
+    // console.log("update");
+  }
 }
 
 function renderPlayer(phaser, player) {
@@ -56,5 +68,6 @@ function renderPlayer(phaser, player) {
     player.pos[1],
     "player"
   );
+  playerSprite.id = player.id;
   phaser.players.add(playerSprite);
 }

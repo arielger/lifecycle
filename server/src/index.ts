@@ -3,7 +3,7 @@ import http from "http";
 import { v4 as uuidv4 } from "uuid";
 import { Server as SocketServer } from "socket.io";
 
-import { Player } from "./types";
+import { Player, SocketEventNames } from "./types";
 import { randomIntFromInterval } from "./utils";
 
 const app = express();
@@ -17,7 +17,7 @@ const io = new SocketServer(server, {
   },
 });
 
-const players: Player[] = [];
+let players: Player[] = [];
 
 io.on("connection", (socket) => {
   console.log("A user connected");
@@ -34,13 +34,17 @@ io.on("connection", (socket) => {
   players.push(newPlayer);
 
   // Send the player list to the recently connected player
-  socket.emit("currentPlayers", players);
+  socket.emit(SocketEventNames.AllPlayers, players);
 
   // Send the new player to the rest of players
-  socket.broadcast.emit("newPlayer", newPlayer);
+  socket.broadcast.emit(SocketEventNames.PlayerConnected, newPlayer);
+
+  socket.on("disconnect", () => {
+    players = players.filter((player) => player.id !== newPlayer.id);
+    socket.broadcast.emit(SocketEventNames.PlayerDisconnected, newPlayer.id);
+  });
 
   // socket.on("update", () => {});
-  // socket.on("disconnect", () => {});
 });
 
 server.listen(3000, () => {
