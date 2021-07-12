@@ -8,8 +8,8 @@ const config: Phaser.Types.Core.GameConfig = {
     default: "arcade",
   },
   // @TODO: Review how to adapt to changing viewport size
-  width: window.innerWidth,
-  height: window.innerHeight,
+  width: 500,
+  height: 500,
   scene: GameScene,
 };
 

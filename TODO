@@ -2,7 +2,10 @@ TODO:
 [OK] Move player using keyboard
 [OK] Add ESLINT and Prettier config for server folder
 [] Multiplayer
-    [] Add initial socket.io implementation
-    [] Handle user connecting to the server
-    [] Handle user movement
+    [OK] Add initial socket.io implementation
+    [OK] Handle user connecting to the server
+        Process user connecting,
+        Send initial position
+        Render added player
     [] Handle user disconnection
+    [] Handle user movement

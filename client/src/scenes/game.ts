@@ -1,9 +1,7 @@
 import Phaser from "phaser";
+import { io } from "socket.io-client";
 
 import playerSprite from "url:../assets/characters/player.png";
-
-// @TODO: Probably we should move all the player logic to a separate module
-let cursorKeys;
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -14,6 +12,8 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 export default class GameScene extends Phaser.Scene {
   // @TODO: Add types
   private player;
+  private socket;
+  private players;
 
   constructor() {
     super(sceneConfig);
@@ -27,66 +27,34 @@ export default class GameScene extends Phaser.Scene {
   }
 
   public create() {
-    this.player = this.physics.add.sprite(200, 200, "player");
+    this.players = this.physics.add.group();
 
-    this.player.setCollideWorldBounds(true);
+    // @TODO: Replace with production URL after deploying
+    this.socket = io("ws://localhost:3000");
 
-    this.anims.create({
-      key: "walk-down",
-      frames: this.anims.generateFrameNumbers("player", { start: 0, end: 3 }),
-      frameRate: 24,
-      repeat: -1,
+    this.socket.on("connect", () => {
+      console.log("Socket connected!");
     });
 
-    this.anims.create({
-      key: "walk-right",
-      frames: this.anims.generateFrameNumbers("player", { start: 4, end: 7 }),
-      frameRate: 24,
-      repeat: -1,
+    this.socket.on("currentPlayers", (players) => {
+      console.log("currentPlayers", players);
+      players.forEach((player) => renderPlayer(this, player));
     });
 
-    this.anims.create({
-      key: "walk-up",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 8,
-        end: 11,
-      }),
-      frameRate: 24,
-      repeat: -1,
+    this.socket.on("newPlayer", (player) => {
+      console.log("newPlayer", player);
+      renderPlayer(this, player);
     });
-
-    this.anims.create({
-      key: "walk-left",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 12,
-        end: 15,
-      }),
-      frameRate: 24,
-      repeat: -1,
-    });
-
-    cursorKeys = this.input.keyboard.createCursorKeys();
   }
 
-  public update() {
-    if (cursorKeys.up.isDown) {
-      this.player.setVelocityY(-100);
-      this.player.play("walk-up");
-    } else if (cursorKeys.down.isDown) {
-      this.player.setVelocityY(100);
-      this.player.play("walk-down");
-    } else {
-      this.player.setVelocityY(0);
-    }
+  public update() {}
+}
 
-    if (cursorKeys.left.isDown) {
-      this.player.setVelocityX(-100);
-      this.player.play("walk-left");
-    } else if (cursorKeys.right.isDown) {
-      this.player.setVelocityX(100);
-      this.player.play("walk-right");
-    } else {
-      this.player.setVelocityX(0);
-    }
-  }
+function renderPlayer(phaser, player) {
+  const playerSprite = phaser.add.sprite(
+    player.pos[0],
+    player.pos[1],
+    "player"
+  );
+  phaser.players.add(playerSprite);
 }
