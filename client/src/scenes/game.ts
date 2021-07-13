@@ -3,6 +3,8 @@ import { io } from "socket.io-client";
 
 import { SocketEventNames } from "../../../server/src/types";
 
+import { renderPlayer, removePlayer } from "./players";
+
 import playerSprite from "url:../assets/characters/player.png";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -10,12 +12,12 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   visible: false,
   key: "Game",
 };
-
 export default class GameScene extends Phaser.Scene {
   // @TODO: Add types
   private player;
   private socket;
   private players;
+  private cursorKeys;
 
   constructor() {
     super(sceneConfig);
@@ -31,6 +33,8 @@ export default class GameScene extends Phaser.Scene {
   public create(): void {
     this.players = this.physics.add.group();
 
+    this.cursorKeys = this.input.keyboard.createCursorKeys();
+
     // @TODO: Replace with production URL after deploying
     this.socket = io("ws://localhost:3000");
 
@@ -38,36 +42,55 @@ export default class GameScene extends Phaser.Scene {
       console.log("Socket connected!");
     });
 
-    this.socket.on(SocketEventNames.AllPlayers, (players) => {
-      console.log("currentPlayers", players);
-      players.forEach((player) => renderPlayer(this, player));
-    });
+    const handleNewPlayers = (players) => {
+      for (const playerId in players) {
+        renderPlayer(this, playerId, players[playerId]);
+      }
+    };
 
-    this.socket.on(SocketEventNames.PlayerConnected, (player) => {
-      console.log("playerConnected", player);
-      renderPlayer(this, player);
+    this.socket.on(SocketEventNames.AllPlayers, handleNewPlayers);
+    this.socket.on(SocketEventNames.PlayerConnected, handleNewPlayers);
+
+    this.socket.on(SocketEventNames.PlayersUpdates, (players) => {
+      // @TODO: Improve performance
+      for (const playerId in players) {
+        this.players.getChildren().forEach(function (player) {
+          if (player.id === playerId) {
+            player.setPosition(
+              players[playerId].pos[0],
+              players[playerId].pos[1]
+            );
+          }
+        });
+      }
     });
 
     this.socket.on(SocketEventNames.PlayerDisconnected, (playerId) => {
-      this.players.getChildren().forEach((player) => {
-        if (player.id === playerId) {
-          player.destroy();
-        }
-      });
+      removePlayer(this, playerId);
     });
   }
 
   public update(): void {
-    // console.log("update");
-  }
-}
+    const input = { x: 0, y: 0 };
 
-function renderPlayer(phaser, player) {
-  const playerSprite = phaser.add.sprite(
-    player.pos[0],
-    player.pos[1],
-    "player"
-  );
-  playerSprite.id = player.id;
-  phaser.players.add(playerSprite);
+    if (this.cursorKeys.up.isDown) {
+      input.y = -1;
+    } else if (this.cursorKeys.down.isDown) {
+      input.y = 1;
+    } else {
+      input.y = 0;
+    }
+
+    if (this.cursorKeys.left.isDown) {
+      input.x = -1;
+    } else if (this.cursorKeys.right.isDown) {
+      input.x = 1;
+    } else {
+      input.x = 0;
+    }
+
+    if (input.x !== 0 || input.y !== 0) {
+      this.socket.emit(SocketEventNames.PlayerPositionUpdate, input);
+    }
+  }
 }

@@ -7,5 +7,8 @@ TODO:
         Process user connecting,
         Send initial position
         Render added player
-    [] Handle user disconnection
-    [] Handle user movement
+    [OK] Handle user disconnection
+    [OK] Handle user movement
+[] Review physics and logic loops
+[] Deploy to production
+[] Add testing
