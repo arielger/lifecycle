@@ -5,6 +5,7 @@
     "build": "rimraf ./build && tsc",
     "eslint": "eslint './src'"
   },
+  "license": "AGPL-3.0-or-later",
   "engines": {
     "node": "14.x"
   },

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.html",
   "author": "Ariel Gerstein <ariel.gers@gmail.com>",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "parcel serve ./src/index.html",
     "build": "parcel build ./src/index.html",
