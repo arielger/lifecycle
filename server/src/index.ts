@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import express from "express";
 import http from "http";
 import { v4 as uuidv4 } from "uuid";
@@ -6,13 +7,19 @@ import { Server as SocketServer } from "socket.io";
 import { Players, SocketEventNames } from "./types";
 import { randomIntFromInterval } from "./utils";
 
+// Only require .env files in development or testing environments
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config();
+}
+
 const app = express();
 const server = http.createServer(app);
 
-// @TODO: Get client url using env variables
+const PORT = process.env.PORT || 3000;
+
 const io = new SocketServer(server, {
   cors: {
-    origin: "http://localhost:1234",
+    origin: process.env.CLIENT_URL,
     methods: ["GET", "POST"],
   },
 });
@@ -61,6 +68,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(process.env.PORT || 3000, () => {
-  console.log("listening on *:3000");
+server.listen(PORT, () => {
+  console.log(`Listening on *:${PORT}`);
 });
