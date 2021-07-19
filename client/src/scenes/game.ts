@@ -35,6 +35,8 @@ export default class GameScene extends Phaser.Scene {
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
 
+    console.log("process.env.SOCKET_SERVER_URL", process.env.SOCKET_SERVER_URL);
+
     this.socket = io(process.env.SOCKET_SERVER_URL);
 
     this.socket.on("connect", () => {
