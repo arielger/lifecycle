@@ -41,6 +41,33 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1,
     });
 
+    this.anims.create({
+      key: "walkUp",
+      frames: this.anims.generateFrameNumbers("skeleton", {
+        frames: [1, 5, 9, 13],
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "walkLeft",
+      frames: this.anims.generateFrameNumbers("skeleton", {
+        frames: [2, 6, 10, 14],
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "walkRight",
+      frames: this.anims.generateFrameNumbers("skeleton", {
+        frames: [3, 7, 11, 15],
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+
     this.players = this.physics.add.group();
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -65,6 +92,28 @@ export default class GameScene extends Phaser.Scene {
       for (const playerId in players) {
         this.players.getChildren().forEach(function (player) {
           if (player.id === playerId) {
+            if (
+              players[playerId].pos[0] > player.x &&
+              player.anims.currentAnim.key !== "walkRight"
+            ) {
+              player.play("walkRight");
+            } else if (
+              players[playerId].pos[0] < player.x &&
+              player.anims.currentAnim.key !== "walkLeft"
+            ) {
+              player.play("walkLeft");
+            } else if (
+              players[playerId].pos[1] > player.y &&
+              player.anims.currentAnim.key !== "walkDown"
+            ) {
+              player.play("walkDown");
+            } else if (
+              players[playerId].pos[1] < player.y &&
+              player.anims.currentAnim.key !== "walkUp"
+            ) {
+              player.play("walkUp");
+            }
+
             player.setPosition(
               players[playerId].pos[0],
               players[playerId].pos[1]
@@ -85,16 +134,12 @@ export default class GameScene extends Phaser.Scene {
       input.y = -1;
     } else if (this.cursorKeys.down.isDown) {
       input.y = 1;
-    } else {
-      input.y = 0;
-    }
-    if (this.cursorKeys.left.isDown) {
+    } else if (this.cursorKeys.left.isDown) {
       input.x = -1;
     } else if (this.cursorKeys.right.isDown) {
       input.x = 1;
-    } else {
-      input.x = 0;
     }
+
     if (input.x !== 0 || input.y !== 0) {
       this.socket.emit(SocketEventNames.PlayerPositionUpdate, input);
     }
