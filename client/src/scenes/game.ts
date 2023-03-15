@@ -5,7 +5,7 @@ import { SocketEventNames } from "../../../server/src/types";
 
 import { renderPlayer, removePlayer } from "./players";
 
-import playerSprite from "url:../assets/characters/player.png";
+import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -24,18 +24,26 @@ export default class GameScene extends Phaser.Scene {
   }
 
   public preload(): void {
-    this.player = this.load.spritesheet("player", playerSprite, {
+    this.load.spritesheet("skeleton", skeletonSpritesheet, {
       frameWidth: 16,
-      frameHeight: 32,
+      frameHeight: 16,
     });
   }
 
   public create(): void {
+    // reference https://phaser.io/examples/v3/view/animation/create-animation-from-sprite-sheet#
+    this.anims.create({
+      key: "walkDown",
+      frames: this.anims.generateFrameNumbers("skeleton", {
+        frames: [0, 4, 8, 12],
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+
     this.players = this.physics.add.group();
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
-
-    console.log("process.env.SOCKET_SERVER_URL", process.env.SOCKET_SERVER_URL);
 
     this.socket = io(process.env.SOCKET_SERVER_URL);
 
@@ -73,7 +81,6 @@ export default class GameScene extends Phaser.Scene {
 
   public update(): void {
     const input = { x: 0, y: 0 };
-
     if (this.cursorKeys.up.isDown) {
       input.y = -1;
     } else if (this.cursorKeys.down.isDown) {
@@ -81,7 +88,6 @@ export default class GameScene extends Phaser.Scene {
     } else {
       input.y = 0;
     }
-
     if (this.cursorKeys.left.isDown) {
       input.x = -1;
     } else if (this.cursorKeys.right.isDown) {
@@ -89,7 +95,6 @@ export default class GameScene extends Phaser.Scene {
     } else {
       input.x = 0;
     }
-
     if (input.x !== 0 || input.y !== 0) {
       this.socket.emit(SocketEventNames.PlayerPositionUpdate, input);
     }

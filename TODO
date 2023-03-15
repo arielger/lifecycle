@@ -1,14 +1,6 @@
-TODO: 
-[OK] Move player using keyboard
-[OK] Add ESLINT and Prettier config for server folder
-[] Multiplayer
-    [OK] Add initial socket.io implementation
-    [OK] Handle user connecting to the server
-        Process user connecting,
-        Send initial position
-        Render added player
-    [OK] Handle user disconnection
-    [OK] Handle user movement
-[] Review physics and logic loops
-[] Deploy to production
-[] Add testing
+TODO:
+
+- [ ] Add sprites movement for users
+  - [ok] client side
+  - [] change animation depending on direction
+  - [] server side

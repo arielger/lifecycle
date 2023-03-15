@@ -1,10 +1,7 @@
 export function renderPlayer(phaser, playerId, playerData): void {
-  const playerSprite = phaser.add.sprite(
-    playerData.pos[0],
-    playerData.pos[1],
-    "player"
-  );
+  const playerSprite = phaser.add.sprite(playerData.pos[0], playerData.pos[1]);
   playerSprite.id = playerId;
+  playerSprite.play("walkDown");
   phaser.players.add(playerSprite);
 }
 
