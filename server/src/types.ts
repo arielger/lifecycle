@@ -2,9 +2,7 @@ export type Player = {
   pos: [number, number];
 };
 
-export type Players = {
-  [id: string]: Player;
-};
+export type Players = Record<string, Player>;
 
 export enum SocketEventNames {
   // Server to client

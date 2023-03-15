@@ -2,5 +2,7 @@ TODO:
 
 - [ ] Add sprites movement for users
   - [ok] client side
-  - [] change animation depending on direction
-  - [] server side
+  - [ok] change animation depending on direction
+  - [ok] stop animation when user stops moving
+  - [ok] server side
+- [ ] upload to FREE server!!!!

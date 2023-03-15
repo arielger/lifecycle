@@ -93,6 +93,11 @@ export default class GameScene extends Phaser.Scene {
         this.players.getChildren().forEach(function (player) {
           if (player.id === playerId) {
             if (
+              players[playerId].pos[0] === player.x &&
+              players[playerId].pos[1] === player.y
+            ) {
+              player.anims.stop();
+            } else if (
               players[playerId].pos[0] > player.x &&
               player.anims.currentAnim.key !== "walkRight"
             ) {
@@ -128,16 +133,24 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
-  public update(): void {
+  public update(time, delta): void {
+    /*
+    Handle input (sends input messages to server)
+    Update position (using client prediction)
+    Move the other clients based on the server position (interpolation)
+    Draw players on canvas
+    */
+    const movement = 0.15 * delta;
+
     const input = { x: 0, y: 0 };
     if (this.cursorKeys.up.isDown) {
-      input.y = -1;
+      input.y = -movement;
     } else if (this.cursorKeys.down.isDown) {
-      input.y = 1;
+      input.y = movement;
     } else if (this.cursorKeys.left.isDown) {
-      input.x = -1;
+      input.x = -movement;
     } else if (this.cursorKeys.right.isDown) {
-      input.x = 1;
+      input.x = movement;
     }
 
     if (input.x !== 0 || input.y !== 0) {
