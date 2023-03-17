@@ -1,11 +1,14 @@
 import Phaser from "phaser";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
-import { SocketEventNames } from "../../../server/src/types";
+import {
+  ESocketEventNames,
+  TClientToServerEvents,
+  TServerToClientEvents,
+} from "../../../server/src/types";
 
-import { renderPlayer, removePlayer } from "./players";
-
-import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
+import { renderPlayer, removePlayer, updatePlayerSprite } from "./players";
+import { preloadAssets, loadAssets } from "./assets";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -13,123 +16,56 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   key: "Game",
 };
 export default class GameScene extends Phaser.Scene {
-  // @TODO: Add types
-  private player;
-  private socket;
-  private players;
-  private cursorKeys;
+  private socket?: Socket<TServerToClientEvents, TClientToServerEvents>;
+  private players?: Phaser.Physics.Arcade.Group;
+  private cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
+  private playerId?: string;
 
   constructor() {
     super(sceneConfig);
   }
 
   public preload(): void {
-    this.load.spritesheet("skeleton", skeletonSpritesheet, {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
+    preloadAssets(this);
   }
 
   public create(): void {
-    // reference https://phaser.io/examples/v3/view/animation/create-animation-from-sprite-sheet#
-    this.anims.create({
-      key: "walkDown",
-      frames: this.anims.generateFrameNumbers("skeleton", {
-        frames: [0, 4, 8, 12],
-      }),
-      frameRate: 8,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "walkUp",
-      frames: this.anims.generateFrameNumbers("skeleton", {
-        frames: [1, 5, 9, 13],
-      }),
-      frameRate: 8,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "walkLeft",
-      frames: this.anims.generateFrameNumbers("skeleton", {
-        frames: [2, 6, 10, 14],
-      }),
-      frameRate: 8,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "walkRight",
-      frames: this.anims.generateFrameNumbers("skeleton", {
-        frames: [3, 7, 11, 15],
-      }),
-      frameRate: 8,
-      repeat: -1,
-    });
-
-    this.players = this.physics.add.group();
-
+    loadAssets(this);
     this.cursorKeys = this.input.keyboard.createCursorKeys();
+    this.players = this.physics.add.group();
 
     this.socket = io(process.env.SOCKET_SERVER_URL);
 
-    this.socket.on("connect", () => {
-      console.log("Socket connected!");
-    });
+    this.socket.on(ESocketEventNames.GameUpdate, (update) => {
+      if (update.type === "INITIAL_GAME_STATE") {
+        this.playerId = update.playerId;
 
-    const handleNewPlayers = (players) => {
-      for (const playerId in players) {
-        renderPlayer(this, playerId, players[playerId]);
-      }
-    };
+        for (const playerId in update.players) {
+          const player = update.players[playerId];
 
-    this.socket.on(SocketEventNames.AllPlayers, handleNewPlayers);
-    this.socket.on(SocketEventNames.PlayerConnected, handleNewPlayers);
-
-    this.socket.on(SocketEventNames.PlayersUpdates, (players) => {
-      // @TODO: Improve performance
-      for (const playerId in players) {
-        this.players.getChildren().forEach(function (player) {
-          if (player.id === playerId) {
-            if (
-              players[playerId].pos[0] === player.x &&
-              players[playerId].pos[1] === player.y
-            ) {
-              player.anims.stop();
-            } else if (
-              players[playerId].pos[0] > player.x &&
-              player.anims.currentAnim.key !== "walkRight"
-            ) {
-              player.play("walkRight");
-            } else if (
-              players[playerId].pos[0] < player.x &&
-              player.anims.currentAnim.key !== "walkLeft"
-            ) {
-              player.play("walkLeft");
-            } else if (
-              players[playerId].pos[1] > player.y &&
-              player.anims.currentAnim.key !== "walkDown"
-            ) {
-              player.play("walkDown");
-            } else if (
-              players[playerId].pos[1] < player.y &&
-              player.anims.currentAnim.key !== "walkUp"
-            ) {
-              player.play("walkUp");
+          renderPlayer(this, playerId, player);
+        }
+      } else if (update.type === "GAME_STATE") {
+        for (const playerToUpdateId in update.players) {
+          this.players?.getChildren().forEach(function (player) {
+            if (player.id === playerToUpdateId) {
+              const currentPosition = {
+                x: player.x,
+                y: player.y,
+              };
+              updatePlayerSprite(
+                player,
+                currentPosition,
+                update.players[playerToUpdateId].position
+              );
             }
-
-            player.setPosition(
-              players[playerId].pos[0],
-              players[playerId].pos[1]
-            );
-          }
-        });
+          });
+        }
+      } else if (update.type === "PLAYER_JOINED") {
+        renderPlayer(this, update.playerId, update.player);
+      } else if (update.type === "PLAYER_LEFT") {
+        removePlayer(this, update.playerId);
       }
-    });
-
-    this.socket.on(SocketEventNames.PlayerDisconnected, (playerId) => {
-      removePlayer(this, playerId);
     });
   }
 
@@ -143,6 +79,7 @@ export default class GameScene extends Phaser.Scene {
     const movement = 0.15 * delta;
 
     const input = { x: 0, y: 0 };
+
     if (this.cursorKeys.up.isDown) {
       input.y = -movement;
     } else if (this.cursorKeys.down.isDown) {
@@ -153,8 +90,13 @@ export default class GameScene extends Phaser.Scene {
       input.x = movement;
     }
 
+    // this.players.getChildren().find((player) => {
+    //   if (player.id === this.playerId)
+    //     player.setPosition(player.x + input.x, player.y + input.y);
+    // });
+
     if (input.x !== 0 || input.y !== 0) {
-      this.socket.emit(SocketEventNames.PlayerPositionUpdate, input);
+      this.socket.emit(ESocketEventNames.PlayerPositionUpdate, input);
     }
   }
 }
