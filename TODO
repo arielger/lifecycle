@@ -1,4 +1,6 @@
 TODO:
 
 - [OK] Add sprites movement for users
+- [OK] Remove Phaser Math import - use standalone library
+- [ ] Add client-side prediction
 - [ ] upload to FREE server!!!!

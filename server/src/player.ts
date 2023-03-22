@@ -1,16 +1,25 @@
 import { randomInt } from "./utils";
 import { v4 as uuidv4 } from "uuid";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Math from "phaser/src/math";
+import { TVector2 } from "../../common/src/modules/math";
+import {
+  TPlayerInput,
+  processPlayerInput,
+} from "../../common/src/modules/player";
 
 export class Player {
   id: string;
-  position: Math.Vector2;
+  position: TVector2;
 
   constructor() {
     this.id = uuidv4();
-    this.position = new Math.Vector2(randomInt(0, 500), randomInt(0, 500));
+    this.position = {
+      x: randomInt(0, 500),
+      y: randomInt(0, 500),
+    };
+  }
+
+  processInput(input: TPlayerInput): void {
+    this.position = processPlayerInput(this.position, input);
   }
 }

@@ -22,6 +22,8 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
+    "@types/dat.gui": "^0.7.7",
+    "dat.gui": "^0.7.9",
     "phaser": "3.55.2",
     "socket.io-client": "^4.1.3"
   }

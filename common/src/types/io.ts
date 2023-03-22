@@ -1,4 +1,4 @@
-import { Math } from "phaser";
+import { TPlayerInput, TPlayer, TPlayers } from "../modules/player";
 
 export enum ESocketEventNames {
   // Server to client
@@ -8,10 +8,7 @@ export enum ESocketEventNames {
 }
 
 export type TClientToServerEvents = {
-  [ESocketEventNames.PlayerPositionUpdate]: (positionDelta: {
-    x: number;
-    y: number;
-  }) => void;
+  [ESocketEventNames.PlayerPositionUpdate]: (input: TPlayerInput) => void;
 };
 
 export type TServerToClientEvents = {
@@ -36,17 +33,4 @@ export type TServerToClientEvents = {
           players: TPlayers;
         }
   ) => void;
-};
-
-export type TPlayer = {
-  position: Math.Vector2;
-};
-
-export type TPlayers = Record<string, TPlayer>;
-
-// The list of messages could include other types of actions but for now
-// we only have position updates
-export type TPlayerInputMessage = {
-  playerId: string;
-  positionDelta: [number, number];
 };

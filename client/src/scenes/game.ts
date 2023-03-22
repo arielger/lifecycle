@@ -5,98 +5,97 @@ import {
   ESocketEventNames,
   TClientToServerEvents,
   TServerToClientEvents,
-} from "../../../server/src/types";
+} from "../../../common/src/types";
+import {
+  ECursorKey,
+  processPlayerInput,
+} from "../../../common/src/modules/player";
+import { gameConfig } from "./gui";
 
-import { renderPlayer, removePlayer, updatePlayerSprite } from "./players";
-import { preloadAssets, loadAssets } from "./assets";
+import { Player, PlayersManager } from "./player";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
   visible: false,
   key: "Game",
 };
+
 export default class GameScene extends Phaser.Scene {
   private socket?: Socket<TServerToClientEvents, TClientToServerEvents>;
-  private players?: Phaser.Physics.Arcade.Group;
   private cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
-  private playerId?: string;
+
+  private inputSequenceNumber = 0;
+
+  private playersManager?: PlayersManager;
 
   constructor() {
     super(sceneConfig);
   }
 
   public preload(): void {
-    preloadAssets(this);
+    Player.preloadAssets(this);
   }
 
   public create(): void {
-    loadAssets(this);
-    this.cursorKeys = this.input.keyboard.createCursorKeys();
-    this.players = this.physics.add.group();
+    Player.loadAssets(this);
 
+    this.cursorKeys = this.input.keyboard.createCursorKeys();
     this.socket = io(process.env.SOCKET_SERVER_URL);
+
+    this.playersManager = new PlayersManager({ scene: this });
 
     this.socket.on(ESocketEventNames.GameUpdate, (update) => {
       if (update.type === "INITIAL_GAME_STATE") {
-        this.playerId = update.playerId;
-
-        for (const playerId in update.players) {
-          const player = update.players[playerId];
-
-          renderPlayer(this, playerId, player);
-        }
+        this.playersManager?.initializePlayers(update.playerId, update.players);
       } else if (update.type === "GAME_STATE") {
-        for (const playerToUpdateId in update.players) {
-          this.players?.getChildren().forEach(function (player) {
-            if (player.id === playerToUpdateId) {
-              const currentPosition = {
-                x: player.x,
-                y: player.y,
-              };
-              updatePlayerSprite(
-                player,
-                currentPosition,
-                update.players[playerToUpdateId].position
-              );
-            }
-          });
-        }
+        this.playersManager?.updatePlayers(update.players);
       } else if (update.type === "PLAYER_JOINED") {
-        renderPlayer(this, update.playerId, update.player);
+        this.playersManager?.addPlayer(update.playerId, update.player);
       } else if (update.type === "PLAYER_LEFT") {
-        removePlayer(this, update.playerId);
+        this.playersManager?.removePlayer(update.playerId);
       }
     });
   }
 
-  public update(time, delta): void {
+  public update(time: number, delta: number): void {
     /*
     Handle input (sends input messages to server)
     Update position (using client prediction)
     Move the other clients based on the server position (interpolation)
     Draw players on canvas
     */
-    const movement = 0.15 * delta;
 
-    const input = { x: 0, y: 0 };
+    let key: ECursorKey | undefined;
 
-    if (this.cursorKeys.up.isDown) {
-      input.y = -movement;
-    } else if (this.cursorKeys.down.isDown) {
-      input.y = movement;
-    } else if (this.cursorKeys.left.isDown) {
-      input.x = -movement;
-    } else if (this.cursorKeys.right.isDown) {
-      input.x = movement;
+    if (this.cursorKeys?.up.isDown) {
+      key = ECursorKey.UP;
+    } else if (this.cursorKeys?.down.isDown) {
+      key = ECursorKey.DOWN;
+    } else if (this.cursorKeys?.left.isDown) {
+      key = ECursorKey.LEFT;
+    } else if (this.cursorKeys?.right.isDown) {
+      key = ECursorKey.RIGHT;
     }
 
-    // this.players.getChildren().find((player) => {
-    //   if (player.id === this.playerId)
-    //     player.setPosition(player.x + input.x, player.y + input.y);
-    // });
+    if (key) {
+      const input = {
+        key,
+        timeDelta: delta,
+        sequenceNumber: this.inputSequenceNumber,
+      };
 
-    if (input.x !== 0 || input.y !== 0) {
-      this.socket.emit(ESocketEventNames.PlayerPositionUpdate, input);
+      if (gameConfig.clientSidePrediction) {
+        const player = this.playersManager?.currentPlayer;
+        const newPosition = processPlayerInput(
+          { x: player?.x, y: player?.y },
+          input
+        );
+        player?.updatePosition(newPosition);
+      }
+
+      this.socket?.emit(ESocketEventNames.PlayerPositionUpdate, input);
+
+      this.inputSequenceNumber++;
     }
   }
 }

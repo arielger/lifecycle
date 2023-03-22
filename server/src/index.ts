@@ -2,20 +2,15 @@ import dotenv from "dotenv";
 import express from "express";
 import http from "http";
 
-// @TODO: Review this very ugly hack
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Math from "phaser/src/math";
 import { Server as SocketServer } from "socket.io";
 
-import { Player } from "./player";
 import {
-  TPlayers,
-  TPlayerInputMessage,
   TClientToServerEvents,
   TServerToClientEvents,
   ESocketEventNames,
-} from "./types";
+} from "../../common/src/types";
+import { TPlayerInputMessage } from "../../common/src/modules/player";
+import { Player } from "./player";
 import { createLoop } from "./utils";
 
 // Only require .env files in development or testing environments
@@ -42,7 +37,7 @@ const io = new SocketServer<TClientToServerEvents, TServerToClientEvents>(
 
 // Game state
 
-const players: TPlayers = {};
+const players: Record<string, Player> = {};
 let inputMessages: TPlayerInputMessage[] = [];
 
 io.on("connection", (socket) => {
@@ -71,10 +66,10 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on(ESocketEventNames.PlayerPositionUpdate, (positionDelta) => {
+  socket.on(ESocketEventNames.PlayerPositionUpdate, (input) => {
     inputMessages.push({
       playerId: player.id,
-      positionDelta: [positionDelta.x, positionDelta.y],
+      input,
     });
   });
 });
@@ -97,9 +92,11 @@ const UPDATE_LOOP_RATE_PER_SECOND = 22;
   Clear any inputs that we have stored
   */
 createLoop(1000 / PHYSICS_LOOP_RATE_PER_SECOND, () => {
-  inputMessages.forEach(({ playerId, positionDelta }) => {
+  inputMessages.forEach(({ playerId, input }) => {
     const player = players[playerId];
-    player.position = player.position.add(new Math.Vector2(...positionDelta));
+    if (player) {
+      player.processInput(input);
+    }
   });
   inputMessages = [];
 });
