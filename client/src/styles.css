@@ -9,3 +9,13 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+#game {
+  height: 100%;
+}
+
+#game > canvas {
+  height: 100% !important;
+  width: auto !important;
+  aspect-ratio: 1 / 1;
+}

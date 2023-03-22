@@ -2,7 +2,7 @@
   "compilerOptions": {
     "typeRoots": ["@types", "node_modules/@types"],
     "target": "es5",
-    "lib": ["es6"],
+    "lib": ["es6", "dom"],
     "allowJs": true,
     "outDir": "build",
     "rootDir": "src",
