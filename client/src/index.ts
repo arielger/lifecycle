@@ -9,11 +9,11 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   parent: document.getElementById("game")!,
-  width: 400,
-  height: 400,
+  width: 250,
+  height: 250,
   scene: GameScene,
   pixelArt: true,
-  zoom: 2,
+  zoom: 4,
 };
 
 new Phaser.Game(config);

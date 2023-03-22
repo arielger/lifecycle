@@ -96,6 +96,7 @@ createLoop(1000 / PHYSICS_LOOP_RATE_PER_SECOND, () => {
     const player = players[playerId];
     if (player) {
       player.processInput(input);
+      player.lastProcessedInput = input.inputNumber;
     }
   });
   inputMessages = [];
@@ -108,5 +109,6 @@ createLoop(1000 / PHYSICS_LOOP_RATE_PER_SECOND, () => {
   What you send in the state update is up to you, and often more than one server update loop can be employed to lower the amount of traffic used. A simple example would be a day/night cycle. If the cycle was changing at a much lower rate than everything else, you can send the state of the sun every 5 seconds instead of every 45 ms.
   */
 createLoop(1000 / UPDATE_LOOP_RATE_PER_SECOND, () => {
+  // @TODO: Review private vs public information in players
   io.emit(ESocketEventNames.GameUpdate, { type: "GAME_STATE", players });
 });

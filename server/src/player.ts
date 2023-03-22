@@ -8,16 +8,9 @@ import {
 } from "../../common/src/modules/player";
 
 export class Player {
-  id: string;
-  position: TVector2;
-
-  constructor() {
-    this.id = uuidv4();
-    this.position = {
-      x: randomInt(0, 500),
-      y: randomInt(0, 500),
-    };
-  }
+  id: string = uuidv4();
+  position: TVector2 = { x: randomInt(0, 250), y: randomInt(0, 250) };
+  lastProcessedInput = 0;
 
   processInput(input: TPlayerInput): void {
     this.position = processPlayerInput(this.position, input);

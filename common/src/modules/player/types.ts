@@ -12,7 +12,7 @@ export enum ECursorKey {
 export type TPlayerInput = {
   key: ECursorKey;
   timeDelta: number;
-  sequenceNumber: number;
+  inputNumber: number;
 };
 
 export type TPlayerInputMessage = {
@@ -22,6 +22,7 @@ export type TPlayerInputMessage = {
 
 export type TPlayer = {
   position: TVector2;
+  lastProcessedInput: number;
 };
 
 export type TPlayers = Record<string, TPlayer>;

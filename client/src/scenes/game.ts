@@ -9,6 +9,7 @@ import {
 import {
   ECursorKey,
   processPlayerInput,
+  TPlayerInput,
 } from "../../../common/src/modules/player";
 import { gameConfig } from "./gui";
 
@@ -24,7 +25,9 @@ export default class GameScene extends Phaser.Scene {
   private socket?: Socket<TServerToClientEvents, TClientToServerEvents>;
   private cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
 
+  private playerId?: string;
   private inputSequenceNumber = 0;
+  private pendingInputs: TPlayerInput[] = [];
 
   private playersManager?: PlayersManager;
 
@@ -46,9 +49,30 @@ export default class GameScene extends Phaser.Scene {
 
     this.socket.on(ESocketEventNames.GameUpdate, (update) => {
       if (update.type === "INITIAL_GAME_STATE") {
+        this.playerId = update.playerId;
         this.playersManager?.initializePlayers(update.playerId, update.players);
       } else if (update.type === "GAME_STATE") {
         this.playersManager?.updatePlayers(update.players);
+
+        if (gameConfig.serverReconciliation) {
+          const lastProcessedInput =
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            update.players[this.playerId!].lastProcessedInput;
+          this.pendingInputs.forEach((input) => {
+            if (input.inputNumber <= lastProcessedInput) {
+              this.pendingInputs.shift();
+            } else {
+              const player = this.playersManager?.currentPlayer;
+              const newPosition = processPlayerInput(
+                { x: player?.x, y: player?.y },
+                input
+              );
+              player?.updatePosition(newPosition);
+            }
+          });
+        } else {
+          this.pendingInputs = [];
+        }
       } else if (update.type === "PLAYER_JOINED") {
         this.playersManager?.addPlayer(update.playerId, update.player);
       } else if (update.type === "PLAYER_LEFT") {
@@ -78,10 +102,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     if (key) {
-      const input = {
+      const input: TPlayerInput = {
         key,
         timeDelta: delta,
-        sequenceNumber: this.inputSequenceNumber,
+        inputNumber: this.inputSequenceNumber,
       };
 
       if (gameConfig.clientSidePrediction) {
@@ -93,9 +117,15 @@ export default class GameScene extends Phaser.Scene {
         player?.updatePosition(newPosition);
       }
 
-      this.socket?.emit(ESocketEventNames.PlayerPositionUpdate, input);
+      setTimeout(() => {
+        this.socket?.emit(ESocketEventNames.PlayerPositionUpdate, input);
+      }, gameConfig.lag || 0);
 
       this.inputSequenceNumber++;
+
+      if (gameConfig.serverReconciliation) {
+        this.pendingInputs.push(input);
+      }
     }
   }
 }
