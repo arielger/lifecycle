@@ -11,6 +11,7 @@ import {
 } from "../../common/src/types";
 import { TPlayerInputMessage } from "../../common/src/modules/player";
 import { Player } from "./player";
+import "./map";
 import { createLoop } from "./utils";
 
 // Only require .env files in development or testing environments
@@ -36,7 +37,6 @@ const io = new SocketServer<TClientToServerEvents, TServerToClientEvents>(
 );
 
 // Game state
-
 const players: Record<string, Player> = {};
 let inputMessages: TPlayerInputMessage[] = [];
 

@@ -6,10 +6,11 @@ TODO:
 - [ ] Render map
   - [OK] render map (client side)
   - [OK] add collision detection
-  - add collision detection + multiplayer (collision detection on the server)
-    - implement basic logic using 1 box with width and heigth
-- [ ] Add entity interpolation
+  - [OK] add collision detection + multiplayer (collision detection on the server)
 - [ ] upload to FREE server!!!!
+- [ ] Add entity interpolation
+- [ ] improve sprites for other players
+- [ ] add camera that follows the player
 - [ ] Improve common paths / review tsconfig
 
 - [ ] Phaser 2 not updating files https://github.com/parcel-bundler/parcel/issues/4332

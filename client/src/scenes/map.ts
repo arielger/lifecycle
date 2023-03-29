@@ -1,6 +1,6 @@
-import tilesetFloor from "url:../assets/map/TilesetFloor.png";
-import tilesetNature from "url:../assets/map/TilesetNature.png";
-import mapJson from "url:../assets/map/map.json";
+import tilesetFloor from "url:../../../common/src/modules/map/TilesetFloor.png";
+import tilesetNature from "url:../../../common/src/modules/map/TilesetNature.png";
+import mapJson from "url:../../../common/src/modules/map/map.json";
 
 export const preloadMapAssets = (scene: Phaser.Scene): void => {
   scene.load.image("floorTileset", tilesetFloor);
@@ -20,12 +20,12 @@ export const createMap = (
   const natureLayer = map.createLayer("nature", natureTileset, 0, 0);
   natureLayer.setCollisionByProperty({ collides: true });
 
-  const debugGraphics = scene.add.graphics().setAlpha(0.75);
-  natureLayer.renderDebug(debugGraphics, {
-    tileColor: null, // Color of non-colliding tiles
-    collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
-    faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Color of colliding face edges
-  });
+  // const debugGraphics = scene.add.graphics().setAlpha(0.75);
+  // natureLayer.renderDebug(debugGraphics, {
+  //   tileColor: null, // Color of non-colliding tiles
+  //   collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
+  //   faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Color of colliding face edges
+  // });
 
   return natureLayer;
 };

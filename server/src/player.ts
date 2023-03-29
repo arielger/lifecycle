@@ -6,6 +6,7 @@ import {
   TPlayerInput,
   processPlayerInput,
 } from "../../common/src/modules/player";
+import { map } from "./map";
 
 export class Player {
   id: string = uuidv4();
@@ -13,6 +14,12 @@ export class Player {
   lastProcessedInput = 0;
 
   processInput(input: TPlayerInput): void {
-    this.position = processPlayerInput(this.position, input);
+    const newPosition = processPlayerInput(this.position, input);
+
+    // @TODO: Move player height and width to constants?
+    // Validate that new position is not colliding with map
+    if (!map.checkCollision(newPosition, 16, 16)) {
+      this.position = newPosition;
+    }
   }
 }
