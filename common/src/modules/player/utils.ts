@@ -1,11 +1,12 @@
 import { TVector2, addVectors } from "../math";
 import { TPlayerInput, ECursorKey } from "./types";
+import { PLAYER_VELOCITY } from "./config";
 
 export const processPlayerInput = (
   currentPosition: TVector2,
   { key, timeDelta }: TPlayerInput
 ): TVector2 => {
-  const movement = timeDelta * 0.1;
+  const movement = (timeDelta * PLAYER_VELOCITY) / 1000;
   const positionChange = {
     x:
       key === ECursorKey.LEFT

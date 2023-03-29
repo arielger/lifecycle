@@ -10,10 +10,12 @@ import {
   ECursorKey,
   processPlayerInput,
   TPlayerInput,
+  PLAYER_VELOCITY,
 } from "../../../common/src/modules/player";
 import { gameConfig } from "./gui";
 
 import { Player, PlayersManager } from "./player";
+import { preloadMapAssets, createMap } from "./map";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -25,11 +27,12 @@ export default class GameScene extends Phaser.Scene {
   private socket?: Socket<TServerToClientEvents, TClientToServerEvents>;
   private cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
 
+  private playersManager?: PlayersManager;
   private playerId?: string;
+  private player?: Player;
+
   private inputSequenceNumber = 0;
   private pendingInputs: TPlayerInput[] = [];
-
-  private playersManager?: PlayersManager;
 
   constructor() {
     super(sceneConfig);
@@ -37,6 +40,7 @@ export default class GameScene extends Phaser.Scene {
 
   public preload(): void {
     Player.preloadAssets(this);
+    preloadMapAssets(this);
   }
 
   public create(): void {
@@ -47,10 +51,20 @@ export default class GameScene extends Phaser.Scene {
 
     this.playersManager = new PlayersManager({ scene: this });
 
+    const collidingLayer = createMap(this);
+
     this.socket.on(ESocketEventNames.GameUpdate, (update) => {
+      if (!gameConfig.serverSideProcessing) return;
+
       if (update.type === "INITIAL_GAME_STATE") {
-        this.playerId = update.playerId;
         this.playersManager?.initializePlayers(update.playerId, update.players);
+
+        // Initialize current player
+        this.playerId = update.playerId;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        this.player = this.playersManager!.currentPlayer!;
+
+        this.physics.add.collider(collidingLayer, this.player);
       } else if (update.type === "GAME_STATE") {
         this.playersManager?.updatePlayers(update.players);
 
@@ -62,12 +76,11 @@ export default class GameScene extends Phaser.Scene {
             if (input.inputNumber <= lastProcessedInput) {
               this.pendingInputs.shift();
             } else {
-              const player = this.playersManager?.currentPlayer;
               const newPosition = processPlayerInput(
-                { x: player?.x, y: player?.y },
+                { x: this.player?.x, y: this.player?.y },
                 input
               );
-              player?.updatePosition(newPosition);
+              this.player?.setPosition(newPosition.x, newPosition.y);
             }
           });
         } else {
@@ -89,6 +102,11 @@ export default class GameScene extends Phaser.Scene {
     Draw players on canvas
     */
 
+    if (!this.player) return;
+
+    // Stop any previous movement from the last frame
+    this.player.setVelocity(0);
+
     let key: ECursorKey | undefined;
 
     if (this.cursorKeys?.up.isDown) {
@@ -101,6 +119,8 @@ export default class GameScene extends Phaser.Scene {
       key = ECursorKey.RIGHT;
     }
 
+    this.player.updateAnimation(key);
+
     if (key) {
       const input: TPlayerInput = {
         key,
@@ -109,22 +129,32 @@ export default class GameScene extends Phaser.Scene {
       };
 
       if (gameConfig.clientSidePrediction) {
-        const player = this.playersManager?.currentPlayer;
-        const newPosition = processPlayerInput(
-          { x: player?.x, y: player?.y },
-          input
+        this.player.setVelocityX(
+          key === ECursorKey.LEFT
+            ? -PLAYER_VELOCITY
+            : key === ECursorKey.RIGHT
+            ? PLAYER_VELOCITY
+            : 0
         );
-        player?.updatePosition(newPosition);
+        this.player.setVelocityY(
+          key === ECursorKey.UP
+            ? -PLAYER_VELOCITY
+            : key === ECursorKey.DOWN
+            ? PLAYER_VELOCITY
+            : 0
+        );
       }
 
-      setTimeout(() => {
-        this.socket?.emit(ESocketEventNames.PlayerPositionUpdate, input);
-      }, gameConfig.lag || 0);
+      if (gameConfig.serverSideProcessing) {
+        setTimeout(() => {
+          this.socket?.emit(ESocketEventNames.PlayerPositionUpdate, input);
+        }, gameConfig.lag || 0);
 
-      this.inputSequenceNumber++;
+        this.inputSequenceNumber++;
 
-      if (gameConfig.serverReconciliation) {
-        this.pendingInputs.push(input);
+        if (gameConfig.serverReconciliation) {
+          this.pendingInputs.push(input);
+        }
       }
     }
   }

@@ -6,6 +6,10 @@ const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   physics: {
     default: "arcade",
+    arcade: {
+      gravity: { y: 0 },
+      debug: true,
+    },
   },
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   parent: document.getElementById("game")!,

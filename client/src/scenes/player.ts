@@ -1,16 +1,21 @@
 import { TVector2 } from "../../../common/src/modules/math";
-import { TPlayer, TPlayers } from "../../../common/src/modules/player";
+import {
+  ECursorKey,
+  TPlayer,
+  TPlayers,
+} from "../../../common/src/modules/player";
 
 import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
 
 export class PlayersManager {
   scene: Phaser.Scene;
-  players: Phaser.GameObjects.Group;
+  players: Phaser.Physics.Arcade.Group;
   currentPlayer?: Player;
 
   constructor({ scene }: { scene: Phaser.Scene }) {
     this.scene = scene;
-    this.players = this.scene.add.group();
+    // @TODO: Check if we need to include all the players in the physics group?
+    this.players = this.scene.physics.add.group();
   }
 
   initializePlayers(currentPlayerId: string, players: TPlayers): void {
@@ -39,7 +44,8 @@ export class PlayersManager {
       ) as Player[];
 
       if (playerToUpdate) {
-        playerToUpdate.updatePosition(players[playerToUpdateId].position);
+        const newPos = players[playerToUpdateId].position;
+        playerToUpdate.setPosition(newPos.x, newPos.y);
       }
     }
   }
@@ -62,7 +68,7 @@ export class PlayersManager {
   }
 }
 
-export class Player extends Phaser.GameObjects.Sprite {
+export class Player extends Phaser.Physics.Arcade.Sprite {
   scene: Phaser.Scene;
   id: string;
 
@@ -76,7 +82,8 @@ export class Player extends Phaser.GameObjects.Sprite {
     position: TVector2;
   }) {
     super(scene, position.x, position.y, "skeleton");
-    scene.add.existing(this);
+    scene.physics.add.existing(this).setOrigin(0);
+    scene.add.existing(this).setOrigin(0);
 
     this.scene = scene;
     this.id = id;
@@ -129,31 +136,29 @@ export class Player extends Phaser.GameObjects.Sprite {
     });
   }
 
-  updatePosition(newPosition: { x: number; y: number }): void {
-    if (this.x === newPosition.x && this.y === newPosition.y) {
-      this.anims.stop();
-    } else if (
-      newPosition.x > this.x &&
+  updateAnimation(key?: ECursorKey): void {
+    if (
+      key === ECursorKey.RIGHT &&
       this.anims.currentAnim?.key !== "walkRight"
     ) {
       this.play("walkRight");
     } else if (
-      newPosition.x < this.x &&
+      key === ECursorKey.LEFT &&
       this.anims.currentAnim?.key !== "walkLeft"
     ) {
       this.play("walkLeft");
     } else if (
-      this.y > newPosition.y &&
+      key === ECursorKey.UP &&
       this.anims.currentAnim?.key !== "walkUp"
     ) {
       this.play("walkUp");
     } else if (
-      this.y < newPosition.y &&
+      key === ECursorKey.DOWN &&
       this.anims.currentAnim?.key !== "walkDown"
     ) {
       this.play("walkDown");
+    } else if (!key) {
+      this.anims.stop();
     }
-
-    this.setPosition(newPosition.x, newPosition.y);
   }
 }
