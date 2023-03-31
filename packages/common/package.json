@@ -1,5 +1,11 @@
 {
   "name": "common",
   "version": "1.0.0",
-  "main": "build/"
+  "main": "build/",
+  "scripts": {
+    "build": "rimraf ./build tsconfig.tsbuildinfo && tsc --build"
+  },
+  "dependencies": {
+    "rimraf": "^3.0.2"
+  }
 }

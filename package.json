@@ -6,6 +6,9 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "start:server": "lerna run build --scope=common && lerna run start --scope=server"
+  },
   "devDependencies": {
     "lerna": "^6.6.1"
   },

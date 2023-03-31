@@ -1,12 +1,12 @@
 // import * as dat from "dat.gui";
 
-// export const gameConfig = {
-//   lag: 0,
-//   // If false it will simulate a client-side only game
-//   serverSideProcessing: true,
-//   clientSidePrediction: true,
-//   serverReconciliation: true,
-// };
+export const gameConfig = {
+  lag: 0,
+  // If false it will simulate a client-side only game
+  serverSideProcessing: true,
+  clientSidePrediction: true,
+  serverReconciliation: true,
+};
 
 // const gui = new dat.GUI({ name: "My GUI", width: 400 });
 

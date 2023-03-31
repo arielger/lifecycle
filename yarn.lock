@@ -1401,11 +1401,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/dat.gui@^0.7.7":
-  version "0.7.9"
-  resolved "https://registry.yarnpkg.com/@types/dat.gui/-/dat.gui-0.7.9.tgz#9e16985a0a6b4ef652c53212ee813e5968aff9a8"
-  integrity sha512-UiqZasQIask5cUwWOO6BgOjP1dNj9ChYtmeAb4WTKs5IJ7ha3ATRTeXY7/TzlmEZznh40lS6Ov5BdNA+tU+fWQ==
-
 "@types/express-serve-static-core@^4.17.33":
   version "4.17.33"
   resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.33.tgz#de35d30a9d637dc1450ad18dd583d75d5733d543"
@@ -2483,11 +2478,6 @@ dargs@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/dargs/-/dargs-7.0.0.tgz#04015c41de0bcb69ec84050f3d9be0caf8d6d5cc"
   integrity sha512-2iy1EkLdlBzQGvbweYRFxmFath8+K7+AKB0TlhHWkNuH+TmovaMH/Wp7V7R4u7f4SnX3OgLsU9t1NI9ioDnUpg==
-
-dat.gui@^0.7.9:
-  version "0.7.9"
-  resolved "https://registry.yarnpkg.com/dat.gui/-/dat.gui-0.7.9.tgz#860cab06053b028e327820eabdf25a13cf07b17e"
-  integrity sha512-sCNc1OHobc+Erc1HqiswYgHdVNpSJUlk/Hz8vzOCsER7rl+oF/4+v8GXFUyCgtXpoCX6+bnmg07DedLvBLwYKQ==
 
 dateformat@^3.0.0:
   version "3.0.3"
