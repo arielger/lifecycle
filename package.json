@@ -9,5 +9,8 @@
   "devDependencies": {
     "lerna": "^6.6.1"
   },
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "engines": {
+    "node": "18.x"
+  }
 }

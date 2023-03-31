@@ -8,9 +8,6 @@
     "build": "rimraf ./build && tsc --build",
     "eslint": "eslint './src'"
   },
-  "engines": {
-    "node": "14.x"
-  },
   "dependencies": {
     "@types/express": "^4.17.13",
     "@types/node": "^16.3.1",
