@@ -1,0 +1,13 @@
+{
+  "name": "lifecycle",
+  "author": "Ariel Gerstein <ariel.gers@gmail.com>",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^6.6.1"
+  },
+  "version": "0.0.1"
+}

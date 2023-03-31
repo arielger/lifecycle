@@ -3,10 +3,11 @@ TODO:
 - [OK] Add sprites movement for users
 - [OK] Remove Phaser Math import - use standalone library
 - [OK] Add client-side prediction + server reconciliation
-- [ ] Render map
+- [OK] Render map
   - [OK] render map (client side)
   - [OK] add collision detection
   - [OK] add collision detection + multiplayer (collision detection on the server)
+- [OK] Organize code with Lerna + monorepo
 - [ ] upload to FREE server!!!!
 - [ ] Add entity interpolation
 - [ ] improve sprites for other players

@@ -8,8 +8,8 @@ import {
   TClientToServerEvents,
   TServerToClientEvents,
   ESocketEventNames,
-} from "../../common/src/types";
-import { TPlayerInputMessage } from "../../common/src/modules/player";
+} from "common/src/types";
+import { TPlayerInputMessage } from "common/src/modules/player";
 import { Player } from "./player";
 import "./map";
 import { createLoop } from "./utils";

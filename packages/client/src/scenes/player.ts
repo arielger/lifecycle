@@ -1,9 +1,5 @@
-import { TVector2 } from "../../../common/src/modules/math";
-import {
-  ECursorKey,
-  TPlayer,
-  TPlayers,
-} from "../../../common/src/modules/player";
+import { TVector2 } from "common/src/modules/math";
+import { ECursorKey, TPlayer, TPlayers } from "common/src/modules/player";
 
 import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
 

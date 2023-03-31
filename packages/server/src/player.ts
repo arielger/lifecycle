@@ -1,11 +1,8 @@
 import { randomInt } from "./utils";
 import { v4 as uuidv4 } from "uuid";
 
-import { TVector2 } from "../../common/src/modules/math";
-import {
-  TPlayerInput,
-  processPlayerInput,
-} from "../../common/src/modules/player";
+import { TVector2 } from "common/src/modules/math";
+import { TPlayerInput, processPlayerInput } from "common/src/modules/player";
 import { map } from "./map";
 
 export class Player {

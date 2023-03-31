@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./build",
+    "target": "es5",
+    "module": "commonjs",
+    "lib": ["es6"],
+    "allowJs": true,
+    "baseUrl": "./src",
+    "composite": true,
+    "strict": true,         
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  }
+}

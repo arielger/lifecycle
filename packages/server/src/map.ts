@@ -1,5 +1,5 @@
-import { TVector2 } from "../../common/src/modules/math";
-import mapJson from "../../common/src/modules/map/map.json";
+import { TVector2 } from "common/src/modules/math";
+import mapJson from "common/src/modules/map/map.json";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const natureLayer = mapJson.layers.find((l) => l.name === "nature")!;

@@ -5,13 +5,13 @@ import {
   ESocketEventNames,
   TClientToServerEvents,
   TServerToClientEvents,
-} from "../../../common/src/types";
+} from "common/src/types";
 import {
   ECursorKey,
   processPlayerInput,
   TPlayerInput,
   PLAYER_VELOCITY,
-} from "../../../common/src/modules/player";
+} from "common/src/modules/player";
 import { gameConfig } from "./gui";
 
 import { Player, PlayersManager } from "./player";
