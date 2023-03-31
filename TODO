@@ -9,6 +9,13 @@ TODO:
   - [OK] add collision detection + multiplayer (collision detection on the server)
 - [OK] Organize code with Lerna + monorepo
 - [ ] upload to FREE server!!!!
+- [ ] Add GUI utility again - check error:
+
+```
+  ../../node_modules/@types/dat.gui/index.d.ts(66,17): error TS2304: Cannot find name 'HTMLElement'.
+  ../../node_modules/@types/dat.gui/index.d.ts(117,17): error TS2304: Cannot find name 'HTMLElement'.
+```
+
 - [ ] Add entity interpolation
 - [ ] improve sprites for other players
 - [ ] add camera that follows the player
