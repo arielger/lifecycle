@@ -1,4 +1,4 @@
-// import * as dat from "dat.gui";
+import dat from "dat.gui";
 
 export const gameConfig = {
   lag: 0,
@@ -8,9 +8,9 @@ export const gameConfig = {
   serverReconciliation: true,
 };
 
-// const gui = new dat.GUI({ name: "My GUI", width: 400 });
+const gui = new dat.GUI({ name: "My GUI", width: 400 });
 
-// gui.add(gameConfig, "clientSidePrediction").name("Client-side prediction");
-// gui.add(gameConfig, "serverReconciliation").name("Server reconciliation");
-// gui.add(gameConfig, "serverSideProcessing").name("Server-side processing");
-// gui.add(gameConfig, "lag", 0, 500);
+gui.add(gameConfig, "clientSidePrediction").name("Client-side prediction");
+gui.add(gameConfig, "serverReconciliation").name("Server reconciliation");
+gui.add(gameConfig, "serverSideProcessing").name("Server-side processing");
+gui.add(gameConfig, "lag", 0, 500);

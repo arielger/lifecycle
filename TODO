@@ -1,25 +1,6 @@
 TODO:
 
-- [OK] Add sprites movement for users
-- [OK] Remove Phaser Math import - use standalone library
-- [OK] Add client-side prediction + server reconciliation
-- [OK] Render map
-  - [OK] render map (client side)
-  - [OK] add collision detection
-  - [OK] add collision detection + multiplayer (collision detection on the server)
-- [OK] Organize code with Lerna + monorepo
-- [ ] upload to FREE server!!!!
-- [ ] Add GUI utility again - check error:
-
-```
-  ../../node_modules/@types/dat.gui/index.d.ts(66,17): error TS2304: Cannot find name 'HTMLElement'.
-  ../../node_modules/@types/dat.gui/index.d.ts(117,17): error TS2304: Cannot find name 'HTMLElement'.
-```
-
-- [ ] Move packages to main folder (remove duplicated deps)
 - [ ] Add entity interpolation
 - [ ] improve sprites for other players
 - [ ] add camera that follows the player
 - [ ] Improve common paths / review tsconfig
-
-- [ ] Phaser 2 not updating files https://github.com/parcel-bundler/parcel/issues/4332

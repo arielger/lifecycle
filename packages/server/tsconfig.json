@@ -10,6 +10,8 @@
     "strict": true,         
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    // Add "skipLibCheck" to fix error with dat.gui types (dom types not present on server)
+    "skipLibCheck": true
   }
 }
