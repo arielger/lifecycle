@@ -42,8 +42,6 @@ const players: Record<string, Player> = {};
 let inputMessages: TPlayerInputMessage[] = [];
 
 io.on("connection", (socket) => {
-  console.log("a user connected");
-
   const player = new Player();
   players[player.id] = player;
 

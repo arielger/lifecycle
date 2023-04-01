@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "start:server": "lerna run build --scope=common && lerna run start --scope=server"
+    "start:server": "lerna run build --scope=@lifecycle/common && lerna run start --scope=@lifecycle/server"
   },
   "devDependencies": {
     "lerna": "^6.6.1"
