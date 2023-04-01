@@ -1,11 +1,11 @@
 {
-  "name": "common",
+  "name": "@lifecycle/common",
   "version": "1.0.0",
-  "main": "build/",
   "scripts": {
     "build": "rimraf ./build tsconfig.tsbuildinfo && tsc --build"
   },
   "dependencies": {
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "typescript": "^5.0.3"
   }
 }

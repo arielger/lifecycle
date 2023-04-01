@@ -1,6 +1,6 @@
-import tilesetFloor from "url:common/src/modules/map/TilesetFloor.png";
-import tilesetNature from "url:common/src/modules/map/TilesetNature.png";
-import mapJson from "common/src/modules/map/map.json";
+import tilesetFloor from "url:@lifecycle/common/src/modules/map/TilesetFloor.png";
+import tilesetNature from "url:@lifecycle/common/src/modules/map/TilesetNature.png";
+import mapJson from "@lifecycle/common/src/modules/map/map.json";
 
 export const preloadMapAssets = (scene: Phaser.Scene): void => {
   scene.load.image("floorTileset", tilesetFloor);

@@ -16,6 +16,7 @@ TODO:
   ../../node_modules/@types/dat.gui/index.d.ts(117,17): error TS2304: Cannot find name 'HTMLElement'.
 ```
 
+- [ ] Move packages to main folder (remove duplicated deps)
 - [ ] Add entity interpolation
 - [ ] improve sprites for other players
 - [ ] add camera that follows the player
