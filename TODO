@@ -1,6 +1,12 @@
 TODO:
 
+FEATURES
+
+- [OK] Add animation/sprites for other players
+- [ ] Add camera that follows the player + make map bigger
+- [ ] Add README.md with project info
 - [ ] Add entity interpolation
-- [ ] improve sprites for other players
-- [ ] add camera that follows the player
-- [ ] Improve common paths / review tsconfig
+
+TECH IMPROVEMENTS
+
+- [ ]

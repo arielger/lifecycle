@@ -45,6 +45,21 @@ export class PlayersManager {
 
       if (playerToUpdate) {
         const newPos = players[playerToUpdateId].position;
+
+        if (playerToUpdateId !== this.currentPlayer?.id) {
+          const direction =
+            playerToUpdate.body.position.x < newPos.x
+              ? ECursorKey.RIGHT
+              : playerToUpdate.body.position.x > newPos.x
+              ? ECursorKey.LEFT
+              : playerToUpdate.body.position.y < newPos.y
+              ? ECursorKey.DOWN
+              : playerToUpdate.body.position.y > newPos.y
+              ? ECursorKey.UP
+              : undefined;
+          playerToUpdate.updateAnimation(direction);
+        }
+
         playerToUpdate.setPosition(newPos.x, newPos.y);
       }
     }
@@ -100,6 +115,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     // reference https://phaser.io/examples/v3/view/animation/create-animation-from-sprite-sheet#
 
     scene.anims.create({
+      key: "idle",
+      frames: [{ key: "skeleton", frame: 0 }],
+    });
+
+    scene.anims.create({
       key: "walkDown",
       frames: scene.anims.generateFrameNumbers("skeleton", {
         frames: [0, 4, 8, 12],
@@ -137,28 +157,22 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateAnimation(key?: ECursorKey): void {
-    if (
-      key === ECursorKey.RIGHT &&
-      this.anims.currentAnim?.key !== "walkRight"
-    ) {
-      this.play("walkRight");
-    } else if (
-      key === ECursorKey.LEFT &&
-      this.anims.currentAnim?.key !== "walkLeft"
-    ) {
-      this.play("walkLeft");
-    } else if (
-      key === ECursorKey.UP &&
-      this.anims.currentAnim?.key !== "walkUp"
-    ) {
-      this.play("walkUp");
-    } else if (
-      key === ECursorKey.DOWN &&
-      this.anims.currentAnim?.key !== "walkDown"
-    ) {
-      this.play("walkDown");
-    } else if (!key) {
-      this.anims.stop();
+    const keyToAnimation = {
+      [ECursorKey.RIGHT]: "walkRight",
+      [ECursorKey.LEFT]: "walkLeft",
+      [ECursorKey.UP]: "walkUp",
+      [ECursorKey.DOWN]: "walkDown",
+    };
+
+    if (key) {
+      this.play(keyToAnimation[key], true);
+    } else {
+      if (this.anims.currentAnim?.key.startsWith("walk")) {
+        this.anims.setCurrentFrame(this.anims.currentAnim.frames[0]);
+        this.anims.stop();
+      } else {
+        this.anims.play("idle", true);
+      }
     }
   }
 }

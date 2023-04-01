@@ -13,4 +13,4 @@ const gui = new dat.GUI({ name: "My GUI", width: 400 });
 gui.add(gameConfig, "clientSidePrediction").name("Client-side prediction");
 gui.add(gameConfig, "serverReconciliation").name("Server reconciliation");
 gui.add(gameConfig, "serverSideProcessing").name("Server-side processing");
-gui.add(gameConfig, "lag", 0, 500);
+gui.add(gameConfig, "lag", 0, 1000);
