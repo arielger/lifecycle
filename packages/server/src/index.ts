@@ -27,6 +27,20 @@ const server = http.createServer(app);
 
 const PORT = process.env.PORT || 3000;
 
+app.get("/", async (_req, res, _next) => {
+  const healthcheck = {
+    uptime: process.uptime(),
+    message: "OK",
+    timestamp: Date.now(),
+  };
+  try {
+    res.send(healthcheck);
+  } catch (error) {
+    healthcheck.message = error as any;
+    res.status(503).send();
+  }
+});
+
 const io = new SocketServer<TClientToServerEvents, TServerToClientEvents>(
   server,
   {
