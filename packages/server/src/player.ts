@@ -10,8 +10,20 @@ import { map } from "./map";
 
 export class Player {
   id: string = uuidv4();
-  position: TVector2 = { x: randomInt(0, 250), y: randomInt(0, 250) };
+  position: TVector2 = this.getInitialPosition();
   lastProcessedInput = 0;
+
+  getInitialPosition(): TVector2 {
+    let validPosition;
+
+    while (!validPosition) {
+      const pos = { x: randomInt(0, 250), y: randomInt(0, 250) };
+
+      if (!map.checkCollision(pos, 16, 16)) validPosition = pos;
+    }
+
+    return validPosition;
+  }
 
   processInput(input: TPlayerInput): void {
     const newPosition = processPlayerInput(this.position, input);

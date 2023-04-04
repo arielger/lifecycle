@@ -7,7 +7,7 @@ FEATURES
 - [ ] Make game responsive -> game should cover all the viewport
 - [OK] Add camera that follows the player
   - [OK] Add server collision checking for world borders
-- [ ] Add README.md with project info
+- [OK] Add README.md with project info
 - [ ] Add entity interpolation
 
 TECH IMPROVEMENTS
