@@ -12,6 +12,7 @@ import {
   TPlayerInput,
   PLAYER_VELOCITY,
 } from "@lifecycle/common/src/modules/player";
+import { MAP_SIZE } from "@lifecycle/common/src/modules/map";
 import { gameConfig } from "./gui";
 
 import { Player, PlayersManager } from "./player";
@@ -53,6 +54,10 @@ export default class GameScene extends Phaser.Scene {
 
     const collidingLayer = createMap(this);
 
+    this.cameras.main.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
+
+    this.physics.world.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
+
     this.socket.on(ESocketEventNames.GameUpdate, (update) => {
       if (!gameConfig.serverSideProcessing) return;
 
@@ -65,6 +70,10 @@ export default class GameScene extends Phaser.Scene {
         this.player = this.playersManager!.currentPlayer!;
 
         this.physics.add.collider(collidingLayer, this.player);
+
+        this.player.setCollideWorldBounds(true);
+
+        this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
       } else if (update.type === "GAME_STATE") {
         this.playersManager?.updatePlayers(update.players);
 

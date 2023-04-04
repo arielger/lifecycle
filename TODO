@@ -3,7 +3,10 @@ TODO:
 FEATURES
 
 - [OK] Add animation/sprites for other players
-- [ ] Add camera that follows the player + make map bigger
+- [OK] Make map bigger
+- [ ] Make game responsive -> game should cover all the viewport
+- [OK] Add camera that follows the player
+  - [OK] Add server collision checking for world borders
 - [ ] Add README.md with project info
 - [ ] Add entity interpolation
 

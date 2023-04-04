@@ -2,22 +2,30 @@ import Phaser from "phaser";
 
 import GameScene from "./scenes/game";
 
+const viewSize = 360;
+const maxDimension =
+  window.innerWidth > window.innerHeight ? "width" : "height";
+
+const aspectRatio = window.innerWidth / window.innerHeight;
+
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   physics: {
     default: "arcade",
     arcade: {
       gravity: { y: 0 },
-      debug: true,
+      // debug: true,
     },
   },
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  parent: document.getElementById("game")!,
-  width: 250,
-  height: 250,
+  scale: {
+    // @TODO: Review how to handle scaling -> screens with same width and height will see more of the map
+    width: maxDimension === "width" ? viewSize : viewSize * aspectRatio,
+    height: maxDimension === "height" ? viewSize : viewSize / aspectRatio,
+    mode: Phaser.Scale.FIT,
+    parent: "game",
+  },
   scene: GameScene,
   pixelArt: true,
-  zoom: 4,
 };
 
 new Phaser.Game(config);

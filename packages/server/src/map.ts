@@ -1,5 +1,6 @@
 import { TVector2 } from "@lifecycle/common/build/modules/math";
 import mapJson from "@lifecycle/common/src/modules/map/map.json";
+import { MAP_SIZE } from "@lifecycle/common/build/modules/map";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const natureLayer = mapJson.layers.find((l) => l.name === "nature")!;
@@ -30,7 +31,13 @@ export class Map {
   }
 
   checkCollision(position: TVector2, width: number, height: number): boolean {
-    return this.colliders.some(
+    const worldCollides =
+      position.x < 0 ||
+      position.x > MAP_SIZE.width - width ||
+      position.y < 0 ||
+      position.y > MAP_SIZE.height - height;
+
+    const tilesCollides = this.colliders.some(
       (collider) =>
         !(
           collider.position.x > position.x + width ||
@@ -39,6 +46,8 @@ export class Map {
           collider.position.y + collider.height < position.y
         )
     );
+
+    return worldCollides || tilesCollides;
   }
 }
 
