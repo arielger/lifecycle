@@ -32,18 +32,18 @@ export class Map {
 
   checkCollision(position: TVector2, width: number, height: number): boolean {
     const worldCollides =
-      position.x < 0 ||
-      position.x > MAP_SIZE.width - width ||
-      position.y < 0 ||
-      position.y > MAP_SIZE.height - height;
+      position.x < width / 2 ||
+      position.x > MAP_SIZE.width - width / 2 ||
+      position.y < height / 2 ||
+      position.y > MAP_SIZE.height - height / 2;
 
     const tilesCollides = this.colliders.some(
       (collider) =>
         !(
-          collider.position.x > position.x + width ||
-          collider.position.x + collider.width < position.x ||
-          collider.position.y > position.y + height ||
-          collider.position.y + collider.height < position.y
+          collider.position.x > position.x + width / 2 ||
+          collider.position.x + collider.width < position.x - width / 2 ||
+          collider.position.y > position.y + height / 2 ||
+          collider.position.y + collider.height < position.y - height / 2
         )
     );
 

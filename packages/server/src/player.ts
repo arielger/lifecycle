@@ -6,7 +6,11 @@ import {
   TPlayerInput,
   processPlayerInput,
 } from "@lifecycle/common/build/modules/player";
+import { MAP_SIZE } from "@lifecycle/common/build/modules/map";
 import { map } from "./map";
+
+// @TODO: Move player height and width to constants?
+const playerSize = 16;
 
 export class Player {
   id: string = uuidv4();
@@ -17,9 +21,12 @@ export class Player {
     let validPosition;
 
     while (!validPosition) {
-      const pos = { x: randomInt(0, 250), y: randomInt(0, 250) };
+      const pos = {
+        x: randomInt(playerSize / 2, MAP_SIZE.width - playerSize / 2),
+        y: randomInt(playerSize / 2, MAP_SIZE.height - playerSize / 2),
+      };
 
-      if (!map.checkCollision(pos, 16, 16)) validPosition = pos;
+      if (!map.checkCollision(pos, playerSize, playerSize)) validPosition = pos;
     }
 
     return validPosition;
@@ -28,9 +35,8 @@ export class Player {
   processInput(input: TPlayerInput): void {
     const newPosition = processPlayerInput(this.position, input);
 
-    // @TODO: Move player height and width to constants?
     // Validate that new position is not colliding with map
-    if (!map.checkCollision(newPosition, 16, 16)) {
+    if (!map.checkCollision(newPosition, playerSize, playerSize)) {
       this.position = newPosition;
     }
   }

@@ -4,20 +4,30 @@ import { PLAYER_VELOCITY } from "./config";
 
 export const processPlayerInput = (
   currentPosition: TVector2,
-  { key, timeDelta }: TPlayerInput
+  { keys, timeDelta }: TPlayerInput
 ): TVector2 => {
   const movement = (timeDelta * PLAYER_VELOCITY) / 1000;
+
+  const directionKey = keys.find((k) =>
+    [
+      ECursorKey.UP,
+      ECursorKey.DOWN,
+      ECursorKey.LEFT,
+      ECursorKey.RIGHT,
+    ].includes(k)
+  );
+
   const positionChange = {
     x:
-      key === ECursorKey.LEFT
+      directionKey === ECursorKey.LEFT
         ? -movement
-        : key === ECursorKey.RIGHT
+        : directionKey === ECursorKey.RIGHT
         ? movement
         : 0,
     y:
-      key === ECursorKey.UP
+      directionKey === ECursorKey.UP
         ? -movement
-        : key === ECursorKey.DOWN
+        : directionKey === ECursorKey.DOWN
         ? movement
         : 0,
   };

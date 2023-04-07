@@ -5,12 +5,13 @@ export enum ECursorKey {
   DOWN = "DOWN",
   LEFT = "LEFT",
   RIGHT = "RIGHT",
+  SPACE = "SPACE",
 }
 
 // The list of messages could include other types of actions but for now
 // we only have position updates
 export type TPlayerInput = {
-  key: ECursorKey;
+  keys: ECursorKey[];
   timeDelta: number;
   inputNumber: number;
 };

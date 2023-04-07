@@ -10,7 +10,6 @@ import {
   ECursorKey,
   processPlayerInput,
   TPlayerInput,
-  PLAYER_VELOCITY,
 } from "@lifecycle/common/src/modules/player";
 import { MAP_SIZE } from "@lifecycle/common/src/modules/map";
 import { gameConfig } from "./gui";
@@ -26,7 +25,9 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 
 export default class GameScene extends Phaser.Scene {
   private socket?: Socket<TServerToClientEvents, TClientToServerEvents>;
-  private cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
+
+  private cursorKeys!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private keySpace!: Phaser.Input.Keyboard.Key;
 
   private playersManager?: PlayersManager;
   private playerId?: string;
@@ -47,15 +48,19 @@ export default class GameScene extends Phaser.Scene {
   public create(): void {
     Player.loadAssets(this);
 
-    this.cursorKeys = this.input.keyboard.createCursorKeys();
     this.socket = io(process.env.SOCKET_SERVER_URL);
 
     this.playersManager = new PlayersManager({ scene: this });
 
+    // Input
+    this.cursorKeys = this.input.keyboard.createCursorKeys();
+    this.keySpace = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.SPACE
+    );
+
+    // Map configuration
     const collidingLayer = createMap(this);
-
     this.cameras.main.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
-
     this.physics.world.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
 
     this.socket.on(ESocketEventNames.GameUpdate, (update) => {
@@ -70,8 +75,7 @@ export default class GameScene extends Phaser.Scene {
         this.player = this.playersManager!.currentPlayer!;
 
         this.physics.add.collider(collidingLayer, this.player);
-
-        this.player.setCollideWorldBounds(true);
+        this.player.body.setCollideWorldBounds(true);
 
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
       } else if (update.type === "GAME_STATE") {
@@ -113,46 +117,32 @@ export default class GameScene extends Phaser.Scene {
 
     if (!this.player) return;
 
-    // Stop any previous movement from the last frame
-    this.player.setVelocity(0);
+    const keys: ECursorKey[] = [];
 
-    let key: ECursorKey | undefined;
-
+    // Movement handling
     if (this.cursorKeys?.up.isDown) {
-      key = ECursorKey.UP;
+      keys.push(ECursorKey.UP);
     } else if (this.cursorKeys?.down.isDown) {
-      key = ECursorKey.DOWN;
+      keys.push(ECursorKey.DOWN);
     } else if (this.cursorKeys?.left.isDown) {
-      key = ECursorKey.LEFT;
+      keys.push(ECursorKey.LEFT);
     } else if (this.cursorKeys?.right.isDown) {
-      key = ECursorKey.RIGHT;
+      keys.push(ECursorKey.RIGHT);
     }
 
-    this.player.updateAnimation(key);
+    // Attack handling
+    if (Phaser.Input.Keyboard.JustDown(this.keySpace)) {
+      keys.push(ECursorKey.SPACE);
+    }
 
-    if (key) {
+    this.player.update({ keys });
+
+    if (keys.length > 0) {
       const input: TPlayerInput = {
-        key,
+        keys,
         timeDelta: delta,
         inputNumber: this.inputSequenceNumber,
       };
-
-      if (gameConfig.clientSidePrediction) {
-        this.player.setVelocityX(
-          key === ECursorKey.LEFT
-            ? -PLAYER_VELOCITY
-            : key === ECursorKey.RIGHT
-            ? PLAYER_VELOCITY
-            : 0
-        );
-        this.player.setVelocityY(
-          key === ECursorKey.UP
-            ? -PLAYER_VELOCITY
-            : key === ECursorKey.DOWN
-            ? PLAYER_VELOCITY
-            : 0
-        );
-      }
 
       if (gameConfig.serverSideProcessing) {
         setTimeout(() => {

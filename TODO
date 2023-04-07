@@ -8,7 +8,12 @@ FEATURES
 - [OK] Add camera that follows the player
   - [OK] Add server collision checking for world borders
 - [OK] Add README.md with project info
+- [ ] Add player attack
+  - [ ] Review change of direction while attacking (should update attack sprite)
+  - [ ] Add cooldown
 - [ ] Add entity interpolation
+- [ ] Improve sprites collision detection (collision with some parts of the tile only)
+- [ ] Add chat (?)
 
 TECH IMPROVEMENTS
 
