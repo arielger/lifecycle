@@ -45,6 +45,7 @@ export class PlayersManager {
         scene: this.scene,
         id: playerId,
         position: player.position,
+        health: player.health,
       });
       this.players.add(newPlayer);
 
@@ -64,6 +65,8 @@ export class PlayersManager {
       ) as Player[];
 
       if (playerToUpdate) {
+        playerToUpdate.health = players[playerToUpdateId].health;
+
         const newPos = players[playerToUpdateId].position;
 
         if (playerToUpdateId !== this.currentPlayer?.id) {
@@ -80,6 +83,7 @@ export class PlayersManager {
       scene: this.scene,
       id: playerId,
       position: player.position,
+      health: player.health,
     });
     this.players.add(newPlayer);
   }
@@ -99,15 +103,18 @@ export class Player extends Phaser.GameObjects.Container {
   playerSprite: Phaser.GameObjects.Sprite;
   // weaponSprite: Phaser.GameObjects.Sprite;
   body!: Phaser.Physics.Arcade.Body;
+  health!: number;
 
   constructor({
     scene,
     id,
     position,
+    health,
   }: {
     scene: Phaser.Scene;
     id: string;
     position: TVector2;
+    health: number;
   }) {
     super(scene, position.x, position.y, []);
     scene.add.existing(this);
@@ -122,6 +129,8 @@ export class Player extends Phaser.GameObjects.Container {
 
     // this.add([this.playerSprite, this.weaponSprite]);
     this.add([this.playerSprite]);
+
+    this.health = health;
 
     this.scene = scene;
     this.id = id;

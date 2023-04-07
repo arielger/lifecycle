@@ -11,9 +11,11 @@ FEATURES
 - [ ] Add player attack
   - [ ] Review change of direction while attacking (should update attack sprite)
   - [ ] Add cooldown
+  - [OK] Add hearth containers
 - [ ] Add entity interpolation
 - [ ] Improve sprites collision detection (collision with some parts of the tile only)
 - [ ] Add chat (?)
+- [ ] Fix depth rendering of players
 
 TECH IMPROVEMENTS
 

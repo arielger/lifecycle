@@ -8,7 +8,7 @@ import {
 } from "@lifecycle/common/src/types";
 import {
   ECursorKey,
-  processPlayerInput,
+  getPlayerNewPosition,
   TPlayerInput,
 } from "@lifecycle/common/src/modules/player";
 import { MAP_SIZE } from "@lifecycle/common/src/modules/map";
@@ -16,6 +16,7 @@ import { gameConfig } from "./gui";
 
 import { Player, PlayersManager } from "./player";
 import { preloadMapAssets, createMap } from "./map";
+import { HeartsUI } from "./hearts";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -33,6 +34,8 @@ export default class GameScene extends Phaser.Scene {
   private playerId?: string;
   private player?: Player;
 
+  private heartsUI?: HeartsUI;
+
   private inputSequenceNumber = 0;
   private pendingInputs: TPlayerInput[] = [];
 
@@ -42,6 +45,7 @@ export default class GameScene extends Phaser.Scene {
 
   public preload(): void {
     Player.preloadAssets(this);
+    HeartsUI.preloadAssets(this);
     preloadMapAssets(this);
   }
 
@@ -78,8 +82,15 @@ export default class GameScene extends Phaser.Scene {
         this.player.body.setCollideWorldBounds(true);
 
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
+
+        this.heartsUI = new HeartsUI({
+          scene: this,
+          health: this.player.health,
+        });
       } else if (update.type === "GAME_STATE") {
         this.playersManager?.updatePlayers(update.players);
+
+        this.heartsUI?.updateHealth(this.player!.health);
 
         if (gameConfig.serverReconciliation) {
           const lastProcessedInput =
@@ -89,7 +100,7 @@ export default class GameScene extends Phaser.Scene {
             if (input.inputNumber <= lastProcessedInput) {
               this.pendingInputs.shift();
             } else {
-              const newPosition = processPlayerInput(
+              const newPosition = getPlayerNewPosition(
                 { x: this.player?.x, y: this.player?.y },
                 input
               );

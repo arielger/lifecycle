@@ -24,6 +24,7 @@ export type TPlayerInputMessage = {
 export type TPlayer = {
   position: TVector2;
   lastProcessedInput: number;
+  health: number;
 };
 
 export type TPlayers = Record<string, TPlayer>;

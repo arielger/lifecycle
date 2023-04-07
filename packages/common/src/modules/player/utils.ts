@@ -2,7 +2,7 @@ import { TVector2, addVectors } from "../math";
 import { TPlayerInput, ECursorKey } from "./types";
 import { PLAYER_VELOCITY } from "./config";
 
-export const processPlayerInput = (
+export const getPlayerNewPosition = (
   currentPosition: TVector2,
   { keys, timeDelta }: TPlayerInput
 ): TVector2 => {

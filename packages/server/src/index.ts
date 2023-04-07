@@ -110,7 +110,7 @@ createLoop(1000 / PHYSICS_LOOP_RATE_PER_SECOND, () => {
   inputMessages.forEach(({ playerId, input }) => {
     const player = players[playerId];
     if (player) {
-      player.processInput(input);
+      player.processInput(input, players);
       player.lastProcessedInput = input.inputNumber;
     }
   });
