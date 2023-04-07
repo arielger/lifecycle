@@ -7,7 +7,7 @@ import {
 } from "@lifecycle/common/src/modules/player";
 
 import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
-import stickInHandImage from "url:../assets/weapons/stick/SpriteInHand.png";
+// import stickInHandImage from "url:../assets/weapons/stick/SpriteInHand.png";
 
 import { gameConfig } from "./gui";
 
@@ -142,7 +142,7 @@ export class Player extends Phaser.GameObjects.Container {
       frameHeight: 16,
     });
 
-    scene.load.image("stick-in-hand", stickInHandImage);
+    // scene.load.image("stick-in-hand", stickInHandImage);
   }
 
   static loadAssets(scene: Phaser.Scene): void {
