@@ -5,6 +5,14 @@ import { MAP_SIZE } from "@lifecycle/common/build/modules/map";
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const natureLayer = mapJson.layers.find((l) => l.name === "nature")!;
 
+// Tiled editor assigns a global ID to each tile in the tileset
+// We need to get the first GID to calculate the tile index
+// More information: https://doc.mapeditor.org/en/stable/reference/global-tile-ids/#mapping-a-gid-to-a-local-tile-id
+
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const natureTileset = mapJson.tilesets.find((t) => t.name === "TilesetNature")!;
+const natureTilesetFirstGID = natureTileset.firstgid;
+
 export class Map {
   colliders: {
     width: number;
@@ -19,14 +27,32 @@ export class Map {
       const tileX = i % natureLayer.width;
       const tileY = Math.floor(i / natureLayer.width);
 
-      this.colliders.push({
-        width: mapJson.tilewidth,
-        height: mapJson.tileheight,
-        position: {
-          x: tileX * mapJson.tilewidth,
-          y: tileY * mapJson.tileheight,
-        },
-      });
+      const localTilesetTileId = tileNumber - natureTilesetFirstGID;
+
+      const customCollisionObjects =
+        natureTileset.tiles![localTilesetTileId].objectgroup?.objects;
+
+      if (customCollisionObjects) {
+        customCollisionObjects.forEach((collisionObject) => {
+          this.colliders.push({
+            width: collisionObject.width,
+            height: collisionObject.height,
+            position: {
+              x: tileX * mapJson.tilewidth + collisionObject.x,
+              y: tileY * mapJson.tileheight + collisionObject.y,
+            },
+          });
+        });
+      } else {
+        this.colliders.push({
+          width: mapJson.tilewidth,
+          height: mapJson.tileheight,
+          position: {
+            x: tileX * mapJson.tilewidth,
+            y: tileY * mapJson.tileheight,
+          },
+        });
+      }
     });
   }
 

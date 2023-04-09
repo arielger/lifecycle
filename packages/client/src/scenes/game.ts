@@ -63,7 +63,7 @@ export default class GameScene extends Phaser.Scene {
     );
 
     // Map configuration
-    const collidingLayer = createMap(this);
+    const collidingLayers = createMap(this);
     this.cameras.main.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
     this.physics.world.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
 
@@ -78,7 +78,11 @@ export default class GameScene extends Phaser.Scene {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.player = this.playersManager!.currentPlayer!;
 
-        this.physics.add.collider(collidingLayer, this.player);
+        collidingLayers.forEach((collidingLayer) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          this.physics.add.collider(collidingLayer, this.player!);
+        });
+
         this.player.body.setCollideWorldBounds(true);
 
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);

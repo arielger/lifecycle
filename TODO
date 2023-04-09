@@ -4,19 +4,30 @@ FEATURES
 
 - [OK] Add animation/sprites for other players
 - [OK] Make map bigger
-- [ ] Make game responsive -> game should cover all the viewport
 - [OK] Add camera that follows the player
   - [OK] Add server collision checking for world borders
 - [OK] Add README.md with project info
+- [OK] Improve sprites collision detection (collision with some parts of the tile only)
+  - [OK] Client-side
+  - [OK] Add collision shapes to map
+  - [OK] Server-side collision
+- [ ] Fix crashing on collision (server side?)
 - [ ] Add player attack
   - [ ] Review change of direction while attacking (should update attack sprite)
   - [ ] Add cooldown
   - [OK] Add hearth containers
 - [ ] Add entity interpolation
-- [ ] Improve sprites collision detection (collision with some parts of the tile only)
 - [ ] Add chat (?)
 - [ ] Fix depth rendering of players
+- [ ] Add favicon
+- [ ] Make game responsive -> game should cover all the viewport
 
 TECH IMPROVEMENTS
 
 - [ ]
+
+## How to implement better map collision detection?
+
+should we use arcade or matterjs/p2 physics system?
+
+Step 1. read everything on the internet

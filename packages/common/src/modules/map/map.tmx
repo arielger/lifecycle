@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.0" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="1">
  <editorsettings>
-  <export target="../../../../../client/src/assets/map.json" format="json"/>
+  <export format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="TilesetFloor" tilewidth="16" tileheight="16" tilecount="572" columns="22">
   <image source="../../../../../../../Desktop/game-assets/NinjaAdventure/Backgrounds/Tilesets/TilesetFloor.png" width="352" height="417"/>
@@ -82,11 +82,17 @@
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="2">
+    <object id="1" x="0" y="2" width="16" height="14"/>
+   </objectgroup>
   </tile>
   <tile id="15">
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="2">
+    <object id="1" x="0" y="2" width="16" height="14"/>
+   </objectgroup>
   </tile>
   <tile id="16">
    <properties>
@@ -162,11 +168,17 @@
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="2">
+    <object id="1" x="0" y="0" width="16" height="15"/>
+   </objectgroup>
   </tile>
   <tile id="31">
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="2">
+    <object id="1" x="0" y="0" width="16" height="15"/>
+   </objectgroup>
   </tile>
   <tile id="32">
    <properties>
@@ -662,11 +674,17 @@
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="2">
+    <object id="2" x="1" y="6" width="15" height="10"/>
+   </objectgroup>
   </tile>
   <tile id="131">
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="3">
+    <object id="5" x="0" y="6" width="14" height="10"/>
+   </objectgroup>
   </tile>
   <tile id="132">
    <properties>
@@ -742,11 +760,17 @@
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="3">
+    <object id="12" x="1" y="0" width="15" height="13"/>
+   </objectgroup>
   </tile>
   <tile id="147">
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="2">
+    <object id="4" x="0" y="0" width="15" height="12"/>
+   </objectgroup>
   </tile>
   <tile id="148">
    <properties>
@@ -992,11 +1016,17 @@
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="2">
+    <object id="1" x="3" y="4" width="13" height="12"/>
+   </objectgroup>
   </tile>
   <tile id="197">
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="4">
+    <object id="9" x="0" y="4" width="14" height="12"/>
+   </objectgroup>
   </tile>
   <tile id="198">
    <properties>
@@ -1072,11 +1102,17 @@
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="3">
+    <object id="4" x="2" y="0" width="14" height="15"/>
+   </objectgroup>
   </tile>
   <tile id="213">
    <properties>
     <property name="collides" type="bool" value="true"/>
    </properties>
+   <objectgroup draworder="index" id="2">
+    <object id="2" x="0" y="0" width="15" height="15"/>
+   </objectgroup>
   </tile>
   <tile id="214">
    <properties>
@@ -1408,10 +1444,10 @@
  </layer>
  <layer id="3" name="nature" width="30" height="30">
   <data encoding="csv">
-618,619,620,633,634,635,636,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,617,618,619,
+618,619,0,633,634,635,636,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,618,619,
 634,635,636,649,650,651,652,0,0,0,0,0,0,0,0,0,0,0,0,0,0,769,770,0,0,0,0,633,634,635,
-650,651,652,617,618,619,620,0,0,0,0,0,0,0,0,0,0,0,0,769,770,785,786,0,0,0,0,649,650,651,
-619,620,0,633,634,635,636,0,0,0,0,0,0,0,0,0,0,0,0,785,786,0,0,0,0,0,0,0,0,0,
+650,651,652,0,618,619,0,0,0,0,0,0,0,0,0,0,0,0,0,769,770,785,786,0,0,0,0,649,650,651,
+619,0,0,633,634,635,636,0,0,0,0,0,0,0,0,0,0,0,0,785,786,0,0,0,0,0,0,0,0,0,
 635,636,0,649,650,651,652,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 651,652,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -1434,9 +1470,9 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,769,770,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,703,704,0,617,618,
 0,0,0,0,785,786,769,770,0,0,769,770,0,0,0,0,0,0,0,0,0,0,0,0,0,719,720,0,633,634,
-0,0,0,0,0,0,785,786,0,0,785,786,0,0,0,0,617,618,619,620,0,0,0,0,0,0,0,0,649,650,
-0,0,0,0,0,0,0,0,0,0,0,0,617,618,619,620,633,634,635,636,0,0,0,0,0,0,0,617,618,619,
-618,619,620,0,0,0,0,0,0,0,0,0,633,634,635,636,649,650,651,652,618,619,620,617,618,619,620,633,634,635,
+0,0,0,0,0,0,785,786,0,0,785,786,0,0,0,0,0,618,619,0,0,0,0,0,0,0,0,0,649,650,
+0,0,0,0,0,0,0,0,0,0,0,0,0,618,619,0,633,634,635,636,0,0,0,0,0,0,0,0,618,619,
+618,619,620,0,0,0,0,0,0,0,0,0,633,634,635,636,649,650,651,652,618,619,0,0,618,619,0,633,634,635,
 634,635,636,0,0,0,0,0,0,0,0,0,649,650,651,652,0,587,588,633,634,635,636,633,634,635,636,649,650,651
 </data>
  </layer>
