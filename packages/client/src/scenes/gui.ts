@@ -1,7 +1,7 @@
 import dat from "dat.gui";
 
 export const gameConfig = {
-  lag: 0,
+  lag: process.env.NODE_ENV === "development" ? 150 : 0,
   // If false it will simulate a client-side only game
   serverSideProcessing: true,
   clientSidePrediction: true,

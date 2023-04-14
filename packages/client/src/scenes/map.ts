@@ -11,7 +11,10 @@ export const preloadMapAssets = (scene: Phaser.Scene): void => {
 
 export const createMap = (
   scene: Phaser.Scene
-): (Phaser.GameObjects.GameObject | Phaser.Physics.Arcade.StaticGroup)[] => {
+): {
+  collisionLayers: Phaser.Tilemaps.TilemapLayer[];
+  collisionGroups: Phaser.Physics.Arcade.StaticGroup[];
+} => {
   const map = scene.make.tilemap({ key: "map" });
 
   // Setup floor layer (no collisions)
@@ -67,5 +70,8 @@ export const createMap = (
   //   faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Color of colliding face edges
   // });
 
-  return [natureLayer, natureCollisionGroup];
+  return {
+    collisionLayers: [natureLayer],
+    collisionGroups: [natureCollisionGroup],
+  };
 };

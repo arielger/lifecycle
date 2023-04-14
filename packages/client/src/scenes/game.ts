@@ -10,6 +10,7 @@ import {
   ECursorKey,
   getPlayerNewPosition,
   TPlayerInput,
+  PLAYER_SIZE,
 } from "@lifecycle/common/src/modules/player";
 import { MAP_SIZE } from "@lifecycle/common/src/modules/map";
 import { gameConfig } from "./gui";
@@ -63,7 +64,7 @@ export default class GameScene extends Phaser.Scene {
     );
 
     // Map configuration
-    const collidingLayers = createMap(this);
+    const { collisionLayers, collisionGroups } = createMap(this);
     this.cameras.main.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
     this.physics.world.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
 
@@ -78,11 +79,10 @@ export default class GameScene extends Phaser.Scene {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.player = this.playersManager!.currentPlayer!;
 
-        collidingLayers.forEach((collidingLayer) => {
+        [...collisionLayers, ...collisionGroups].forEach((collidingLayer) => {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           this.physics.add.collider(collidingLayer, this.player!);
         });
-
         this.player.body.setCollideWorldBounds(true);
 
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
@@ -100,14 +100,47 @@ export default class GameScene extends Phaser.Scene {
           const lastProcessedInput =
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             update.players[this.playerId!].lastProcessedInput;
-          this.pendingInputs.forEach((input) => {
+
+          let newPosition = {
+            x: this.player!.x,
+            y: this.player!.y,
+          };
+
+          this.pendingInputs.forEach((input, index) => {
             if (input.inputNumber <= lastProcessedInput) {
-              this.pendingInputs.shift();
-            } else {
-              const newPosition = getPlayerNewPosition(
-                { x: this.player?.x, y: this.player?.y },
-                input
+              this.pendingInputs.splice(index, 1);
+              return;
+            }
+
+            // Check if player collides with collision tiles or group for each input
+            // If not, update player position
+            const tempPosition = getPlayerNewPosition(newPosition, input);
+
+            const isPlayerColliding =
+              collisionLayers.some((layer) =>
+                layer.getTileAtWorldXY(tempPosition.x, tempPosition.y)
+              ) ||
+              collisionGroups.some((group) =>
+                group.getChildren().some((item) =>
+                  Phaser.Geom.Rectangle.Overlaps(
+                    (item as Phaser.GameObjects.TileSprite).getBounds(),
+                    // @TODO: Review player size
+                    new Phaser.Geom.Rectangle(
+                      tempPosition.x - PLAYER_SIZE / 2,
+                      tempPosition.y - PLAYER_SIZE / 2,
+                      PLAYER_SIZE,
+                      PLAYER_SIZE
+                    )
+                  )
+                )
               );
+
+            if (!isPlayerColliding) {
+              newPosition = tempPosition;
+            }
+
+            // Only change player position if it's the last input
+            if (index === this.pendingInputs.length - 1) {
               this.player?.setPosition(newPosition.x, newPosition.y);
             }
           });
