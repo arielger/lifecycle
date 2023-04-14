@@ -2,6 +2,8 @@
 
 Multiplayer game made with Javascript, PhaserJS and Socket.io
 
+![](https://raw.githubusercontent.com/arielger/lifecycle/main/lifecycle-gif.gif)
+
 ## Development
 
 The repository is a Lerna monorepo that includes three packages:
