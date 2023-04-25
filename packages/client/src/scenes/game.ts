@@ -116,31 +116,34 @@ export default class GameScene extends Phaser.Scene {
             // If not, update player position
             const tempPosition = getPlayerNewPosition(newPosition, input);
 
+            const playerRectangle = new Phaser.Geom.Rectangle(
+              tempPosition.x - PLAYER_SIZE / 2,
+              tempPosition.y - PLAYER_SIZE / 2,
+              PLAYER_SIZE,
+              PLAYER_SIZE
+            );
+
+            const collidingTile = collisionLayers.some((layer) =>
+              layer
+                .getTilesWithinShape(playerRectangle)
+                ?.some((tile) => tile?.properties?.collides)
+            );
+
             const isPlayerColliding =
-              collisionLayers.some((layer) =>
-                layer.getTileAtWorldXY(tempPosition.x, tempPosition.y)
-              ) ||
+              collidingTile ||
               collisionGroups.some((group) =>
-                group.getChildren().some((item) =>
-                  Phaser.Geom.Rectangle.Overlaps(
-                    (item as Phaser.GameObjects.TileSprite).getBounds(),
-                    // @TODO: Review player size
-                    new Phaser.Geom.Rectangle(
-                      tempPosition.x - PLAYER_SIZE / 2,
-                      tempPosition.y - PLAYER_SIZE / 2,
-                      PLAYER_SIZE,
-                      PLAYER_SIZE
+                group
+                  .getChildren()
+                  .some((item) =>
+                    Phaser.Geom.Rectangle.Overlaps(
+                      (item as Phaser.GameObjects.TileSprite).getBounds(),
+                      playerRectangle
                     )
                   )
-                )
               );
 
             if (!isPlayerColliding) {
               newPosition = tempPosition;
-            }
-
-            // Only change player position if it's the last input
-            if (index === this.pendingInputs.length - 1) {
               this.player?.setPosition(newPosition.x, newPosition.y);
             }
           });

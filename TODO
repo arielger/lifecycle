@@ -11,7 +11,11 @@ FEATURES
   - [OK] Client-side
   - [OK] Add collision shapes to map
   - [OK] Server-side collision
-- [ ] Fix crashing on collision (server side?)
+- [OK] Fix crashing on collision (server side?)
+- [OK] Add favicon
+- [ ] Fix collision detection on server reconciliation (client/server)
+  - [OK] Fix colliding tiles detection -> now using custom rectangle + getTilesWithinShape
+  - [ ] Fix server logic not the same as client -> Move server logic to physics system
 - [ ] Add player attack
   - [ ] Review change of direction while attacking (should update attack sprite)
   - [ ] Add cooldown
@@ -19,15 +23,7 @@ FEATURES
 - [ ] Add entity interpolation
 - [ ] Add chat (?)
 - [ ] Fix depth rendering of players
-- [ ] Add favicon
-- [ ] Make game responsive -> game should cover all the viewport
 
 TECH IMPROVEMENTS
 
 - [ ]
-
-## How to implement better map collision detection?
-
-should we use arcade or matterjs/p2 physics system?
-
-Step 1. read everything on the internet
