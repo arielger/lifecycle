@@ -10,5 +10,6 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "esModuleInterop": true,
   }
 }

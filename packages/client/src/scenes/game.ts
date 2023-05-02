@@ -64,9 +64,9 @@ export default class GameScene extends Phaser.Scene {
     );
 
     // Map configuration
-    const { collisionLayers, collisionGroups } = createMap(this);
+    createMap(this);
     this.cameras.main.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
-    this.physics.world.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
+    this.matter.world.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
 
     this.socket.on(ESocketEventNames.GameUpdate, (update) => {
       if (!gameConfig.serverSideProcessing) return;
@@ -78,12 +78,6 @@ export default class GameScene extends Phaser.Scene {
         this.playerId = update.playerId;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.player = this.playersManager!.currentPlayer!;
-
-        [...collisionLayers, ...collisionGroups].forEach((collidingLayer) => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          this.physics.add.collider(collidingLayer, this.player!);
-        });
-        this.player.body.setCollideWorldBounds(true);
 
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
 
@@ -97,56 +91,39 @@ export default class GameScene extends Phaser.Scene {
         this.heartsUI?.updateHealth(this.player!.health);
 
         if (gameConfig.serverReconciliation) {
-          const lastProcessedInput =
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            update.players[this.playerId!].lastProcessedInput;
-
-          let newPosition = {
-            x: this.player!.x,
-            y: this.player!.y,
-          };
-
-          this.pendingInputs.forEach((input, index) => {
-            if (input.inputNumber <= lastProcessedInput) {
-              this.pendingInputs.splice(index, 1);
-              return;
-            }
-
-            // Check if player collides with collision tiles or group for each input
-            // If not, update player position
-            const tempPosition = getPlayerNewPosition(newPosition, input);
-
-            const playerRectangle = new Phaser.Geom.Rectangle(
-              tempPosition.x - PLAYER_SIZE / 2,
-              tempPosition.y - PLAYER_SIZE / 2,
-              PLAYER_SIZE,
-              PLAYER_SIZE
-            );
-
-            const collidingTile = collisionLayers.some((layer) =>
-              layer
-                .getTilesWithinShape(playerRectangle)
-                ?.some((tile) => tile?.properties?.collides)
-            );
-
-            const isPlayerColliding =
-              collidingTile ||
-              collisionGroups.some((group) =>
-                group
-                  .getChildren()
-                  .some((item) =>
-                    Phaser.Geom.Rectangle.Overlaps(
-                      (item as Phaser.GameObjects.TileSprite).getBounds(),
-                      playerRectangle
-                    )
-                  )
-              );
-
-            if (!isPlayerColliding) {
-              newPosition = tempPosition;
-              this.player?.setPosition(newPosition.x, newPosition.y);
-            }
-          });
+          // const lastProcessedInput =
+          //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          //   update.players[this.playerId!].lastProcessedInput;
+          // let newPosition = {
+          //   x: this.player!.x,
+          //   y: this.player!.y,
+          // };
+          // this.pendingInputs.forEach((input, index) => {
+          //   if (input.inputNumber <= lastProcessedInput) {
+          //     this.pendingInputs.splice(index, 1);
+          //     return;
+          //   }
+          //   // Check if player collides with collision tiles or group for each input
+          //   // If not, update player position
+          //   const tempPosition = getPlayerNewPosition(newPosition, input);
+          //   const playerRectangle = new Phaser.Geom.Rectangle(
+          //     tempPosition.x - PLAYER_SIZE / 2,
+          //     tempPosition.y - PLAYER_SIZE / 2,
+          //     PLAYER_SIZE,
+          //     PLAYER_SIZE
+          //   );
+          //   const collidingTile = collisionLayers.some((layer) =>
+          //     layer
+          //       .getTilesWithinShape(playerRectangle)
+          //       ?.some((tile) => tile?.properties?.collides)
+          //   );
+          //   const isPlayerColliding =
+          //     collidingTile ||
+          //   if (!isPlayerColliding) {
+          //     newPosition = tempPosition;
+          //     this.player?.setPosition(newPosition.x, newPosition.y);
+          //   }
+          // });
         } else {
           this.pendingInputs = [];
         }
@@ -159,13 +136,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   public update(time: number, delta: number): void {
-    /*
-    Handle input (sends input messages to server)
-    Update position (using client prediction)
-    Move the other clients based on the server position (interpolation)
-    Draw players on canvas
-    */
-
     if (!this.player) return;
 
     const keys: ECursorKey[] = [];
@@ -186,7 +156,7 @@ export default class GameScene extends Phaser.Scene {
       keys.push(ECursorKey.SPACE);
     }
 
-    this.player.update({ keys });
+    this.player.update({ keys, delta });
 
     if (keys.length > 0) {
       const input: TPlayerInput = {

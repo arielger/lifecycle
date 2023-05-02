@@ -11,8 +11,8 @@ const aspectRatio = window.innerWidth / window.innerHeight;
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   physics: {
-    default: "arcade",
-    arcade: {
+    default: "matter",
+    matter: {
       gravity: { y: 0 },
       // debug: true,
     },

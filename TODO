@@ -13,9 +13,12 @@ FEATURES
   - [OK] Server-side collision
 - [OK] Fix crashing on collision (server side?)
 - [OK] Add favicon
-- [ ] Fix collision detection on server reconciliation (client/server)
-  - [OK] Fix colliding tiles detection -> now using custom rectangle + getTilesWithinShape
-  - [ ] Fix server logic not the same as client -> Move server logic to physics system
+- [ ] Move everything to Matter.js -> Fix collision detection on server reconciliation (client/server)
+  - [OK] Create map with Matter.js (server-side)
+  - [OK] Add world borders (server-side)
+  - [OK] Fix player initial position (server-side)
+  - [OK] Fix timestep client/server - review movement code
+  - [ ] Review server reconciliation code (client-side)
 - [ ] Add player attack
   - [ ] Review change of direction while attacking (should update attack sprite)
   - [ ] Add cooldown

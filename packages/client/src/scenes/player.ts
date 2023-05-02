@@ -3,11 +3,10 @@ import {
   ECursorKey,
   TPlayer,
   TPlayers,
-  PLAYER_VELOCITY,
+  getPlayerVelocity,
 } from "@lifecycle/common/src/modules/player";
 
 import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
-// import stickInHandImage from "url:../assets/weapons/stick/SpriteInHand.png";
 
 import { gameConfig } from "./gui";
 
@@ -29,13 +28,12 @@ const resetAnimationToStart = (sprite: Phaser.GameObjects.Sprite) => {
 
 export class PlayersManager {
   scene: Phaser.Scene;
-  players: Phaser.Physics.Arcade.Group;
+  players: Phaser.GameObjects.Group;
   currentPlayer?: Player;
 
   constructor({ scene }: { scene: Phaser.Scene }) {
     this.scene = scene;
-    // @TODO: Check if we need to include all the players in the physics group?
-    this.players = this.scene.physics.add.group();
+    this.players = this.scene.add.group();
   }
 
   initializePlayers(currentPlayerId: string, players: TPlayers): void {
@@ -101,8 +99,7 @@ export class Player extends Phaser.GameObjects.Container {
   scene: Phaser.Scene;
   id: string;
   playerSprite: Phaser.GameObjects.Sprite;
-  // weaponSprite: Phaser.GameObjects.Sprite;
-  body!: Phaser.Physics.Arcade.Body;
+  body!: MatterJS.BodyType;
   health!: number;
 
   constructor({
@@ -122,12 +119,13 @@ export class Player extends Phaser.GameObjects.Container {
     this.playerSprite = scene.add.sprite(0, 0, "skeleton");
     this.playerSprite.anims.play(EPlayerAnimations.WALK_DOWN);
     resetAnimationToStart(this.playerSprite);
-    // this.weaponSprite = scene.add.sprite(0, 10, "stick-in-hand");
 
     this.setSize(this.playerSprite.width, this.playerSprite.height);
-    scene.physics.world.enable(this);
+    scene.matter.add.gameObject(this);
+    // Prevent body from rotating
+    this.body.inverseInertia = 0;
+    this.body.collisionFilter.group = -1;
 
-    // this.add([this.playerSprite, this.weaponSprite]);
     this.add([this.playerSprite]);
 
     this.health = health;
@@ -219,7 +217,7 @@ export class Player extends Phaser.GameObjects.Container {
     });
   }
 
-  update({ keys }: { keys: ECursorKey[] }): void {
+  update({ keys, delta }: { keys: ECursorKey[]; delta: number }): void {
     // Animation
     const startAttack = keys.includes(ECursorKey.SPACE);
     const movementDirection = keys.find((k) =>
@@ -248,26 +246,12 @@ export class Player extends Phaser.GameObjects.Container {
       resetAnimationToStart(this.playerSprite);
     }
 
-    // Movement
-
-    // Stop any previous movement from the last frame
-    this.body.setVelocity(0);
-
     if (gameConfig.clientSidePrediction) {
-      this.body.setVelocityX(
-        keys.includes(ECursorKey.LEFT)
-          ? -PLAYER_VELOCITY
-          : keys.includes(ECursorKey.RIGHT)
-          ? PLAYER_VELOCITY
-          : 0
-      );
-      this.body.setVelocityY(
-        keys.includes(ECursorKey.UP)
-          ? -PLAYER_VELOCITY
-          : keys.includes(ECursorKey.DOWN)
-          ? PLAYER_VELOCITY
-          : 0
-      );
+      const newVelocity = getPlayerVelocity({
+        delta,
+        keys,
+      });
+      this.scene.matter.setVelocity(this.body, newVelocity.x, newVelocity.y);
     }
   }
 
