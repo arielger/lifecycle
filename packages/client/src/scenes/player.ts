@@ -102,6 +102,9 @@ export class Player extends Phaser.GameObjects.Container {
   body!: MatterJS.BodyType;
   health!: number;
 
+  // Store collision direction to prevent sending invalid player movement to the server
+  collisionDirection?: ECursorKey;
+
   constructor({
     scene,
     id,
@@ -126,6 +129,26 @@ export class Player extends Phaser.GameObjects.Container {
     this.body.inverseInertia = 0;
     this.body.collisionFilter.group = -1;
 
+    this.body.onCollideActiveCallback = ({
+      collision,
+    }: {
+      collision: { normal: TVector2 };
+    }) => {
+      if (collision.normal.x > 0) {
+        this.collisionDirection = ECursorKey.RIGHT;
+      } else if (collision.normal.x < 0) {
+        this.collisionDirection = ECursorKey.LEFT;
+      } else if (collision.normal.y > 0) {
+        this.collisionDirection = ECursorKey.DOWN;
+      } else if (collision.normal.y < 0) {
+        this.collisionDirection = ECursorKey.UP;
+      }
+    };
+
+    this.body.onCollideEndCallback = () => {
+      this.collisionDirection = undefined;
+    };
+
     this.add([this.playerSprite]);
 
     this.health = health;
@@ -139,8 +162,6 @@ export class Player extends Phaser.GameObjects.Container {
       frameWidth: 16,
       frameHeight: 16,
     });
-
-    // scene.load.image("stick-in-hand", stickInHandImage);
   }
 
   static loadAssets(scene: Phaser.Scene): void {

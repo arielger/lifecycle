@@ -8,9 +8,8 @@ import {
 } from "@lifecycle/common/src/types";
 import {
   ECursorKey,
-  getPlayerNewPosition,
+  getPlayerVelocity,
   TPlayerInput,
-  PLAYER_SIZE,
 } from "@lifecycle/common/src/modules/player";
 import { MAP_SIZE } from "@lifecycle/common/src/modules/map";
 import { gameConfig } from "./gui";
@@ -91,39 +90,36 @@ export default class GameScene extends Phaser.Scene {
         this.heartsUI?.updateHealth(this.player!.health);
 
         if (gameConfig.serverReconciliation) {
-          // const lastProcessedInput =
-          //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          //   update.players[this.playerId!].lastProcessedInput;
-          // let newPosition = {
-          //   x: this.player!.x,
-          //   y: this.player!.y,
-          // };
-          // this.pendingInputs.forEach((input, index) => {
-          //   if (input.inputNumber <= lastProcessedInput) {
-          //     this.pendingInputs.splice(index, 1);
-          //     return;
-          //   }
-          //   // Check if player collides with collision tiles or group for each input
-          //   // If not, update player position
-          //   const tempPosition = getPlayerNewPosition(newPosition, input);
-          //   const playerRectangle = new Phaser.Geom.Rectangle(
-          //     tempPosition.x - PLAYER_SIZE / 2,
-          //     tempPosition.y - PLAYER_SIZE / 2,
-          //     PLAYER_SIZE,
-          //     PLAYER_SIZE
-          //   );
-          //   const collidingTile = collisionLayers.some((layer) =>
-          //     layer
-          //       .getTilesWithinShape(playerRectangle)
-          //       ?.some((tile) => tile?.properties?.collides)
-          //   );
-          //   const isPlayerColliding =
-          //     collidingTile ||
-          //   if (!isPlayerColliding) {
-          //     newPosition = tempPosition;
-          //     this.player?.setPosition(newPosition.x, newPosition.y);
-          //   }
-          // });
+          const lastProcessedInput =
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            update.players[this.playerId!].lastProcessedInput;
+
+          let newPosition = {
+            x: this.player!.x,
+            y: this.player!.y,
+          };
+
+          this.pendingInputs.forEach((input, index) => {
+            // Discard inputs already processed by the server
+            if (input.inputNumber <= lastProcessedInput) {
+              this.pendingInputs.splice(index, 1);
+              return;
+            }
+
+            const positionDelta = getPlayerVelocity({
+              delta: input.timeDelta,
+              keys: input.keys,
+            });
+
+            newPosition = {
+              x: newPosition.x + positionDelta.x,
+              y: newPosition.y + positionDelta.y,
+            };
+
+            if (index === this.pendingInputs.length - 1) {
+              this.player!.setPosition(newPosition.x, newPosition.y);
+            }
+          });
         } else {
           this.pendingInputs = [];
         }
@@ -158,9 +154,15 @@ export default class GameScene extends Phaser.Scene {
 
     this.player.update({ keys, delta });
 
-    if (keys.length > 0) {
+    // Prevent sending movements to the server if player is colliding in that direction
+    // (quick fix to simplify server reconciliation process)
+    const filteredKeys = keys.filter(
+      (key) => key !== this.player?.collisionDirection
+    );
+
+    if (filteredKeys.length > 0) {
       const input: TPlayerInput = {
-        keys,
+        keys: filteredKeys,
         timeDelta: delta,
         inputNumber: this.inputSequenceNumber,
       };

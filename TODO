@@ -18,11 +18,15 @@ FEATURES
   - [OK] Add world borders (server-side)
   - [OK] Fix player initial position (server-side)
   - [OK] Fix timestep client/server - review movement code
-  - [ ] Review server reconciliation code (client-side)
+  - [OK] Review server reconciliation code (client-side) -> Hacky solution: don't send input if player is colliding
+  - [ ] Review server collision handling -> player moving around obstacles (not in client)
+        -> Check PhaserJS physics configuration
+        -> Also player can't access narrow spaces
+- [ ] Add monster!!!
 - [ ] Add player attack
-  - [ ] Review change of direction while attacking (should update attack sprite)
   - [ ] Add cooldown
-  - [OK] Add hearth containers
+  - [ ] Review change of direction while attacking (should update attack sprite)
+- [OK] Add hearth containers
 - [ ] Add entity interpolation
 - [ ] Add chat (?)
 - [ ] Fix depth rendering of players
