@@ -2,12 +2,6 @@ import Phaser from "phaser";
 
 import GameScene from "./scenes/game";
 
-const viewSize = 360;
-const maxDimension =
-  window.innerWidth > window.innerHeight ? "width" : "height";
-
-const aspectRatio = window.innerWidth / window.innerHeight;
-
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   physics: {
@@ -18,11 +12,11 @@ const config: Phaser.Types.Core.GameConfig = {
     },
   },
   scale: {
-    // @TODO: Review how to handle scaling -> screens with same width and height will see more of the map
-    width: maxDimension === "width" ? viewSize : viewSize * aspectRatio,
-    height: maxDimension === "height" ? viewSize : viewSize / aspectRatio,
-    mode: Phaser.Scale.FIT,
+    width: 480,
+    height: 240,
+    mode: Phaser.Scale.WIDTH_CONTROLS_HEIGHT,
     parent: "game",
+    autoCenter: Phaser.Scale.CENTER_VERTICALLY,
   },
   scene: GameScene,
   pixelArt: true,

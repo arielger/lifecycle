@@ -23,8 +23,8 @@ FEATURES
     -> Check PhaserJS physics configuration
     -> Also player can't access narrow spaces
 - [OK] Add hearth containers
-- [ ] Add monster
-  - [ ] Add monster movement
+- [OK] Add monster
+  - [OK] Add monster movement
 - [ ] Improve screen size (remove full screen mode)
 - [ ] Add player attack
   - [ ] Add cooldown
