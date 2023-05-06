@@ -1,4 +1,5 @@
 import { TPlayerInput, TPlayer, TPlayers } from "../modules/player";
+import { Monsters } from "../modules/monster";
 
 export enum ESocketEventNames {
   // Server to client
@@ -18,6 +19,7 @@ export type TServerToClientEvents = {
           type: "INITIAL_GAME_STATE";
           playerId: string;
           players: TPlayers;
+          monsters: Monsters;
         }
       | {
           type: "PLAYER_JOINED";
@@ -31,6 +33,7 @@ export type TServerToClientEvents = {
       | {
           type: "GAME_STATE";
           players: TPlayers;
+          monsters: Monsters;
         }
   ) => void;
 };

@@ -16,6 +16,7 @@ import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
 import { gameConfig } from "./gui";
 
 import { Player, PlayersManager } from "./player";
+import { Monster, MonstersManager } from "./monster";
 import { preloadMapAssets, createMap } from "./map";
 import { HeartsUI } from "./hearts";
 
@@ -32,6 +33,7 @@ export default class GameScene extends Phaser.Scene {
   private keySpace!: Phaser.Input.Keyboard.Key;
 
   private playersManager?: PlayersManager;
+  private monstersManager?: MonstersManager;
   private playerId?: string;
   private player?: Player;
 
@@ -46,16 +48,19 @@ export default class GameScene extends Phaser.Scene {
 
   public preload(): void {
     Player.preloadAssets(this);
+    Monster.preloadAssets(this);
     HeartsUI.preloadAssets(this);
     preloadMapAssets(this);
   }
 
   public create(): void {
     Player.loadAssets(this);
+    Monster.loadAssets(this);
 
     this.socket = io(process.env.SOCKET_SERVER_URL);
 
     this.playersManager = new PlayersManager({ scene: this });
+    this.monstersManager = new MonstersManager({ scene: this });
 
     // Input
     this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -73,6 +78,7 @@ export default class GameScene extends Phaser.Scene {
 
       if (update.type === "INITIAL_GAME_STATE") {
         this.playersManager?.initializePlayers(update.playerId, update.players);
+        this.monstersManager?.initializeMonsters(update.monsters);
 
         // Initialize current player
         this.playerId = update.playerId;
@@ -87,6 +93,7 @@ export default class GameScene extends Phaser.Scene {
         });
       } else if (update.type === "GAME_STATE") {
         this.playersManager?.updatePlayers(update.players);
+        this.monstersManager?.updateMonsters(update.monsters);
 
         this.heartsUI?.updateHealth(this.player!.health);
 

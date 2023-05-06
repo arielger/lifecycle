@@ -9,6 +9,7 @@ import {
 import { TPlayerInputMessage } from "@lifecycle/common/build/modules/player";
 
 import { Player, getPlayersPublicData } from "./player";
+import { Monster, initializeMonsters, getMonstersPublicData } from "./monster";
 import { Map } from "./map";
 import { createLoop } from "./utils";
 
@@ -17,8 +18,6 @@ const UPDATE_LOOP_RATE_PER_SECOND = 22;
 export function startGame(
   io: SocketServer<TClientToServerEvents, TServerToClientEvents>
 ): void {
-  // Game state
-  const players: Record<string, Player> = {};
   let inputMessages: TPlayerInputMessage[] = [];
 
   // Initialize matter.js physics engine
@@ -30,7 +29,18 @@ export function startGame(
 
   new Map(engine.world);
 
+  // Game state
+  const players: Record<string, Player> = {};
+  const monsters: Record<string, Monster> = initializeMonsters(engine.world);
+
   matter.Events.on(runner, "afterTick", (event) => {
+    const delta = event.source.delta;
+
+    Object.keys(monsters).forEach((monsterId) => {
+      const monster = monsters[monsterId];
+      monster.update();
+    });
+
     // Restart players velocity on each tick
     Object.keys(players).forEach((playerId) => {
       const player = players[playerId];
@@ -40,7 +50,7 @@ export function startGame(
     inputMessages.forEach(({ playerId, input }) => {
       const player = players[playerId];
       if (player) {
-        player.processInput(input, players, event.source.delta);
+        player.processInput(input, players, delta);
         player.lastProcessedInput = input.inputNumber;
       }
     });
@@ -55,6 +65,7 @@ export function startGame(
     socket.emit(ESocketEventNames.GameUpdate, {
       type: "INITIAL_GAME_STATE",
       players: getPlayersPublicData(players),
+      monsters: getMonstersPublicData(monsters),
       playerId: player.id,
     });
 
@@ -85,6 +96,7 @@ export function startGame(
     io.emit(ESocketEventNames.GameUpdate, {
       type: "GAME_STATE",
       players: getPlayersPublicData(players),
+      monsters: getMonstersPublicData(monsters),
     });
   });
 }

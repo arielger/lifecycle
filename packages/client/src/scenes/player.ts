@@ -13,6 +13,7 @@ import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
 import {
   getDirectionFromAnimation,
   resetAnimationAndStop,
+  getDirectionFromPosition,
 } from "../utils/animations";
 import { gameConfig } from "./gui";
 
@@ -293,16 +294,10 @@ export class Player extends Phaser.GameObjects.Container {
   }
 
   updateAnimation(newPos: TVector2): void {
-    const direction =
-      this.x < newPos.x
-        ? Direction.RIGHT
-        : this.x > newPos.x
-        ? Direction.LEFT
-        : this.y < newPos.y
-        ? Direction.DOWN
-        : this.y > newPos.y
-        ? Direction.UP
-        : undefined;
+    const direction = getDirectionFromPosition(
+      { x: this.x, y: this.y },
+      newPos
+    );
 
     if (direction) {
       const walkAnimation = getPlayerAnimation(PlayerActions.WALK, direction);
