@@ -5,8 +5,8 @@ import {
   Monster as MonsterType,
   Monsters,
 } from "@lifecycle/common/src/modules/monster";
-import { getRandom } from "@lifecycle/common/src/utils/arrays";
-import { Direction } from "@lifecycle/common/build/types";
+import { getRandom } from "@lifecycle/common/build/utils/arrays";
+import { Direction } from "@lifecycle/common/build/types/directions";
 
 import { getValidBodyPosition } from "./map";
 
