@@ -1,8 +1,6 @@
-import { randomInt } from "./utils";
 import { v4 as uuidv4 } from "uuid";
 import matter from "matter-js";
 
-import { TVector2 } from "@lifecycle/common/build/modules/math";
 import {
   TPlayerInput,
   ECursorKey,
@@ -11,7 +9,8 @@ import {
   TPlayer,
   getPlayerVelocity,
 } from "@lifecycle/common/build/modules/player";
-import { MAP_SIZE } from "@lifecycle/common/build/modules/map";
+import { getDirectionFromInputKeys } from "@lifecycle/common/build/utils/input";
+import { getValidBodyPosition } from "./map";
 
 export const getPlayersPublicData = (
   players: Record<string, Player>
@@ -37,7 +36,7 @@ export class Player {
     this.lastProcessedInput = 0;
     this.health = PLAYER_HEALTH;
 
-    const initialPosition = this.getInitialPosition(world);
+    const initialPosition = getValidBodyPosition(world, PLAYER_SIZE);
     this.body = matter.Bodies.rectangle(
       initialPosition.x,
       initialPosition.y,
@@ -53,29 +52,6 @@ export class Player {
     matter.Composite.add(world, this.body);
   }
 
-  // Get random position that doesn't collide with other bodies
-  getInitialPosition(world: matter.World): TVector2 {
-    const pos = {
-      x: randomInt(PLAYER_SIZE / 2, MAP_SIZE.width - PLAYER_SIZE / 2),
-      y: randomInt(PLAYER_SIZE / 2, MAP_SIZE.height - PLAYER_SIZE / 2),
-    };
-
-    const tempBody = matter.Bodies.rectangle(
-      pos.x,
-      pos.y,
-      PLAYER_SIZE,
-      PLAYER_SIZE
-    );
-
-    const collisions = matter.Query.collides(
-      tempBody,
-      matter.Composite.allBodies(world)
-    );
-
-    // If there are collisions, call the function again
-    return collisions.length > 0 ? this.getInitialPosition(world) : pos;
-  }
-
   processInput(
     input: TPlayerInput,
     players: Record<string, Player>,
@@ -83,12 +59,11 @@ export class Player {
   ): void {
     const newVelocity = getPlayerVelocity({
       delta,
-      keys: input.keys,
+      direction: getDirectionFromInputKeys(input.keys),
     });
     matter.Body.setVelocity(this.body, newVelocity);
 
     if (input.keys.includes(ECursorKey.SPACE)) {
-      console.log("ATTACK");
       for (const playerId in players) {
         if (playerId === this.id) continue;
         // @TODO: Improve code to account for player direction

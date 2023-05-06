@@ -1,29 +1,43 @@
 import { TVector2 } from "@lifecycle/common/src/modules/math";
 import {
-  ECursorKey,
   TPlayer,
   TPlayers,
   getPlayerVelocity,
+  ECursorKey,
 } from "@lifecycle/common/src/modules/player";
+import { Direction } from "@lifecycle/common/src/types";
+import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
 
 import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
 
+import {
+  getDirectionFromAnimation,
+  resetAnimationAndStop,
+} from "../utils/animations";
 import { gameConfig } from "./gui";
 
+// Animations
 enum EPlayerAnimations {
-  WALK_DOWN = "WALK_DOWN",
-  WALK_UP = "WALK_UP",
-  WALK_LEFT = "WALK_LEFT",
-  WALK_RIGHT = "WALK_RIGHT",
-  ATTACK_DOWN = "ATTACK_DOWN",
-  ATTACK_UP = "ATTACK_UP",
-  ATTACK_LEFT = "ATTACK_LEFT",
-  ATTACK_RIGHT = "ATTACK_RIGHT",
+  WALK_DOWN = "PLAYER_WALK_DOWN",
+  WALK_UP = "PLAYER_WALK_UP",
+  WALK_LEFT = "PLAYER_WALK_LEFT",
+  WALK_RIGHT = "PLAYER_WALK_RIGHT",
+  ATTACK_DOWN = "PLAYER_ATTACK_DOWN",
+  ATTACK_UP = "PLAYER_ATTACK_UP",
+  ATTACK_LEFT = "PLAYER_ATTACK_LEFT",
+  ATTACK_RIGHT = "PLAYER_ATTACK_RIGHT",
 }
 
-const resetAnimationToStart = (sprite: Phaser.GameObjects.Sprite) => {
-  sprite.anims.setCurrentFrame(sprite.anims.currentAnim.frames[0]);
-  sprite.anims.stop();
+enum PlayerActions {
+  WALK = "WALK",
+  ATTACK = "ATTACK",
+}
+
+const getPlayerAnimation = (
+  animationType: PlayerActions,
+  direction: Direction
+): EPlayerAnimations => {
+  return `PLAYER_${animationType}_${direction}` as EPlayerAnimations;
 };
 
 export class PlayersManager {
@@ -103,7 +117,7 @@ export class Player extends Phaser.GameObjects.Container {
   health!: number;
 
   // Store collision direction to prevent sending invalid player movement to the server
-  collisionDirection?: ECursorKey;
+  collisionDirection?: Direction;
 
   constructor({
     scene,
@@ -121,7 +135,7 @@ export class Player extends Phaser.GameObjects.Container {
 
     this.playerSprite = scene.add.sprite(0, 0, "skeleton");
     this.playerSprite.anims.play(EPlayerAnimations.WALK_DOWN);
-    resetAnimationToStart(this.playerSprite);
+    resetAnimationAndStop(this.playerSprite);
 
     this.setSize(this.playerSprite.width, this.playerSprite.height);
     scene.matter.add.gameObject(this);
@@ -135,13 +149,13 @@ export class Player extends Phaser.GameObjects.Container {
       collision: { normal: TVector2 };
     }) => {
       if (collision.normal.x > 0) {
-        this.collisionDirection = ECursorKey.RIGHT;
+        this.collisionDirection = Direction.RIGHT;
       } else if (collision.normal.x < 0) {
-        this.collisionDirection = ECursorKey.LEFT;
+        this.collisionDirection = Direction.LEFT;
       } else if (collision.normal.y > 0) {
-        this.collisionDirection = ECursorKey.DOWN;
+        this.collisionDirection = Direction.DOWN;
       } else if (collision.normal.y < 0) {
-        this.collisionDirection = ECursorKey.UP;
+        this.collisionDirection = Direction.UP;
       }
     };
 
@@ -152,7 +166,6 @@ export class Player extends Phaser.GameObjects.Container {
     this.add([this.playerSprite]);
 
     this.health = health;
-
     this.scene = scene;
     this.id = id;
   }
@@ -240,37 +253,40 @@ export class Player extends Phaser.GameObjects.Container {
 
   update({ keys, delta }: { keys: ECursorKey[]; delta: number }): void {
     // Animation
-    const startAttack = keys.includes(ECursorKey.SPACE);
-    const movementDirection = keys.find((k) =>
-      [
-        ECursorKey.UP,
-        ECursorKey.DOWN,
-        ECursorKey.LEFT,
-        ECursorKey.RIGHT,
-      ].includes(k)
-    );
     const currentAnimKey = this.playerSprite.anims.currentAnim?.key;
+    const movementInputDirection = getDirectionFromInputKeys(keys);
+
+    const startAttack = keys.includes(ECursorKey.SPACE);
 
     if (startAttack) {
       // @TODO: Review change of direction while attacking (should update attack sprite)
-      const playerDirection =
-        movementDirection || currentAnimKey?.split("_")[1];
+      const animDirection =
+        movementInputDirection || getDirectionFromAnimation(currentAnimKey);
 
       this.playerSprite
-        .play(`ATTACK_${playerDirection}`)
+        .play(getPlayerAnimation(PlayerActions.ATTACK, animDirection))
         .once("animationcomplete", () => {
-          this.playerSprite.anims.play(`WALK_${playerDirection}`, true);
+          this.playerSprite.anims.play(
+            getPlayerAnimation(PlayerActions.WALK, animDirection),
+            true
+          );
         });
-    } else if (movementDirection && !currentAnimKey.startsWith("ATTACK")) {
-      this.playerSprite.play(`WALK_${movementDirection}`, true);
-    } else if (currentAnimKey.startsWith("WALK")) {
-      resetAnimationToStart(this.playerSprite);
+    } else if (
+      movementInputDirection &&
+      !currentAnimKey.includes(PlayerActions.ATTACK)
+    ) {
+      this.playerSprite.play(
+        getPlayerAnimation(PlayerActions.WALK, movementInputDirection),
+        true
+      );
+    } else if (currentAnimKey.includes(PlayerActions.WALK)) {
+      resetAnimationAndStop(this.playerSprite);
     }
 
     if (gameConfig.clientSidePrediction) {
       const newVelocity = getPlayerVelocity({
         delta,
-        keys,
+        direction: movementInputDirection,
       });
       this.scene.matter.setVelocity(this.body, newVelocity.x, newVelocity.y);
     }
@@ -279,24 +295,25 @@ export class Player extends Phaser.GameObjects.Container {
   updateAnimation(newPos: TVector2): void {
     const direction =
       this.x < newPos.x
-        ? ECursorKey.RIGHT
+        ? Direction.RIGHT
         : this.x > newPos.x
-        ? ECursorKey.LEFT
+        ? Direction.LEFT
         : this.y < newPos.y
-        ? ECursorKey.DOWN
+        ? Direction.DOWN
         : this.y > newPos.y
-        ? ECursorKey.UP
+        ? Direction.UP
         : undefined;
 
     if (direction) {
-      const walkAnimation = `WALK_${direction}`;
-
+      const walkAnimation = getPlayerAnimation(PlayerActions.WALK, direction);
       this.playerSprite.play(walkAnimation, true);
-    } else if (this.playerSprite.anims.currentAnim?.key.startsWith("WALK")) {
-      resetAnimationToStart(this.playerSprite);
+    } else if (
+      this.playerSprite.anims.currentAnim?.key.includes(PlayerActions.WALK)
+    ) {
+      resetAnimationAndStop(this.playerSprite);
     } else {
-      this.playerSprite.anims.play("WALK_DOWN", true);
-      resetAnimationToStart(this.playerSprite);
+      this.playerSprite.anims.play(EPlayerAnimations.WALK_DOWN, true);
+      resetAnimationAndStop(this.playerSprite);
     }
   }
 }

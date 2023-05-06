@@ -1,37 +1,29 @@
 import matter from "matter-js";
 
+import { Direction } from "../../types";
 import { ECursorKey } from "./types";
 import { PLAYER_VELOCITY } from "./config";
 
 export const getPlayerVelocity = ({
   delta,
-  keys,
+  direction,
 }: {
   delta: number;
-  keys: ECursorKey[];
+  direction?: Direction;
 }) => {
   const movement = (delta * PLAYER_VELOCITY) / 1000;
 
-  const directionKey = keys.find((k) =>
-    [
-      ECursorKey.UP,
-      ECursorKey.DOWN,
-      ECursorKey.LEFT,
-      ECursorKey.RIGHT,
-    ].includes(k)
-  );
-
   return {
     x:
-      directionKey === ECursorKey.LEFT
+      direction === Direction.LEFT
         ? -movement
-        : directionKey === ECursorKey.RIGHT
+        : direction === Direction.RIGHT
         ? movement
         : 0,
     y:
-      directionKey === ECursorKey.UP
+      direction === Direction.UP
         ? -movement
-        : directionKey === ECursorKey.DOWN
+        : direction === Direction.DOWN
         ? movement
         : 0,
   };

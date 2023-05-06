@@ -2,6 +2,9 @@ import matter from "matter-js";
 import mapJson from "@lifecycle/common/src/modules/map/map.json";
 import { MAP_SIZE } from "@lifecycle/common/build/modules/map";
 
+import { randomInt } from "./utils";
+import { TVector2 } from "@lifecycle/common/build/modules/math";
+
 const addWorldBounds = (world: Matter.World) => {
   matter.Composite.add(world, [
     // Horizontal bounds (left and right)
@@ -96,4 +99,25 @@ export class Map {
     addWorldBounds(world);
     layerToTileset("nature", "TilesetNature", world);
   }
+}
+
+/** Get random map position that doesn't collide with other bodies **/
+export function getValidBodyPosition(
+  world: matter.World,
+  bodySize: number
+): TVector2 {
+  const pos = {
+    x: randomInt(bodySize / 2, MAP_SIZE.width - bodySize / 2),
+    y: randomInt(bodySize / 2, MAP_SIZE.height - bodySize / 2),
+  };
+
+  const tempBody = matter.Bodies.rectangle(pos.x, pos.y, bodySize, bodySize);
+
+  const collisions = matter.Query.collides(
+    tempBody,
+    matter.Composite.allBodies(world)
+  );
+
+  // If there are collisions, call the function again
+  return collisions.length > 0 ? getValidBodyPosition(world, bodySize) : pos;
 }

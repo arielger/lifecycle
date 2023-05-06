@@ -12,6 +12,7 @@ import {
   TPlayerInput,
 } from "@lifecycle/common/src/modules/player";
 import { MAP_SIZE } from "@lifecycle/common/src/modules/map";
+import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
 import { gameConfig } from "./gui";
 
 import { Player, PlayersManager } from "./player";
@@ -108,7 +109,7 @@ export default class GameScene extends Phaser.Scene {
 
             const positionDelta = getPlayerVelocity({
               delta: input.timeDelta,
-              keys: input.keys,
+              direction: getDirectionFromInputKeys(input.keys),
             });
 
             newPosition = {
