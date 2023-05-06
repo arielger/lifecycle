@@ -1,5 +1,5 @@
-import { ECursorKey } from "@lifecycle/common/src/modules/player";
-import { Direction } from "@lifecycle/common/src/types";
+import { ECursorKey } from "../modules/player";
+import { Direction } from "../types/directions";
 
 export const getDirectionFromInputKeys = (
   keys: ECursorKey[]
