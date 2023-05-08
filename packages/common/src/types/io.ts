@@ -5,11 +5,11 @@ export enum ESocketEventNames {
   // Server to client
   GameUpdate = "GAME_UPDATE",
   // Client to server
-  PlayerPositionUpdate = "PLAYER_POSITION_UPDATE",
+  PlayerInput = "PLAYER_INPUT",
 }
 
 export type TClientToServerEvents = {
-  [ESocketEventNames.PlayerPositionUpdate]: (input: TPlayerInput) => void;
+  [ESocketEventNames.PlayerInput]: (input: TPlayerInput) => void;
 };
 
 export type TServerToClientEvents = {

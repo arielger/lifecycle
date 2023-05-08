@@ -25,14 +25,19 @@ FEATURES
 - [OK] Add hearth containers
 - [OK] Add monster
   - [OK] Add monster movement
-- [ ] Improve screen size (remove full screen mode)
+- [OK] Improve screen size (remove full screen mode)
+- [OK] Add monsters attacked animation
 - [ ] Add player attack
   - [ ] Add cooldown
   - [ ] Review change of direction while attacking (should update attack sprite)
+- [ ] Review client side prediction (there are still some weird movements not involving collisions)
 - [ ] Add entity interpolation
 - [ ] Add chat (?)
 - [ ] Fix depth rendering of players
 
 TECH IMPROVEMENTS
 
+- [ ] Add eslint on ci/cd
+- [ ] Add tests?
 - [ ] Auto-build common package (right now you need to build package after changes)
+- [ ] Move to vite - try to fix Parcel cache errors

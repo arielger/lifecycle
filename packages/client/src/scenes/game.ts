@@ -92,6 +92,7 @@ export default class GameScene extends Phaser.Scene {
           health: this.player.health,
         });
       } else if (update.type === "GAME_STATE") {
+        // @TODO: Review => we should be sending deltas of game state
         this.playersManager?.updatePlayers(update.players);
         this.monstersManager?.updateMonsters(update.monsters);
 
@@ -177,7 +178,7 @@ export default class GameScene extends Phaser.Scene {
 
       if (gameConfig.serverSideProcessing) {
         setTimeout(() => {
-          this.socket?.emit(ESocketEventNames.PlayerPositionUpdate, input);
+          this.socket?.emit(ESocketEventNames.PlayerInput, input);
         }, gameConfig.lag || 0);
 
         this.inputSequenceNumber++;

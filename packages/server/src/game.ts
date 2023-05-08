@@ -31,7 +31,9 @@ export function startGame(
 
   // Game state
   const players: Record<string, Player> = {};
-  const monsters: Record<string, Monster> = initializeMonsters(engine.world);
+  const monsters: Record<string, Monster> = {};
+
+  initializeMonsters(engine.world, monsters);
 
   matter.Events.on(runner, "afterTick", (event) => {
     const delta = event.source.delta;
@@ -50,7 +52,7 @@ export function startGame(
     inputMessages.forEach(({ playerId, input }) => {
       const player = players[playerId];
       if (player) {
-        player.processInput(input, players, delta);
+        player.processInput(input, delta, monsters);
         player.lastProcessedInput = input.inputNumber;
       }
     });
@@ -84,7 +86,7 @@ export function startGame(
       });
     });
 
-    socket.on(ESocketEventNames.PlayerPositionUpdate, (input) => {
+    socket.on(ESocketEventNames.PlayerInput, (input) => {
       inputMessages.push({
         playerId: player.id,
         input,

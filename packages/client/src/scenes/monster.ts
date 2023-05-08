@@ -48,20 +48,21 @@ export class MonstersManager {
     }
   }
 
-  updateMonsters(monsters: Monsters): void {
-    for (const monsterToUpdateId in monsters) {
-      const [monsterToUpdate] = this.monsters?.getMatching(
-        "id",
-        monsterToUpdateId
-      );
-
-      if (monsterToUpdate) {
-        monsterToUpdate.health = monsters[monsterToUpdateId].health;
-        const newPos = monsters[monsterToUpdateId].position;
-        monsterToUpdate.updateAnimation(newPos);
-        monsterToUpdate.setPosition(newPos.x, newPos.y);
+  updateMonsters(monstersUpdate: Monsters): void {
+    (this.monsters.getChildren() as Monster[]).forEach((monster) => {
+      const monsterUpdate = monstersUpdate[monster.id];
+      if (!monsterUpdate) {
+        monster.die();
+        return;
       }
-    }
+      if (monsterUpdate.health < monster.health) {
+        monster.hit();
+        monster;
+      }
+      monster.health = monsterUpdate.health;
+      monster.updateAnimation(monsterUpdate.position);
+      monster.setPosition(monsterUpdate.position.x, monsterUpdate.position.y);
+    });
   }
 }
 
@@ -155,5 +156,37 @@ export class Monster extends Phaser.Physics.Matter.Sprite {
       this.anims.play(EMouseAnimations.WALK_DOWN, true);
       resetAnimationAndStop(this);
     }
+  }
+
+  hit(): void {
+    this.scene.tweens.addCounter({
+      from: 255,
+      to: 0,
+      duration: 150,
+      yoyo: true,
+      onUpdate: (tween) => {
+        const value = Math.floor(tween.getValue());
+        this.setTint(Phaser.Display.Color.GetColor(255, value, value));
+      },
+      onComplete: () => {
+        this.clearTint();
+      },
+    });
+  }
+
+  die(): void {
+    this.scene.tweens.addCounter({
+      from: 0,
+      to: 255,
+      duration: 400,
+      onUpdate: (tween) => {
+        const value = Math.floor(tween.getValue());
+        this.setTint(Phaser.Display.Color.GetColor(value, value, value));
+      },
+      onComplete: () => {
+        this.clearTint();
+        this.destroy();
+      },
+    });
   }
 }

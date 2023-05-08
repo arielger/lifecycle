@@ -10,7 +10,10 @@ import {
   getPlayerVelocity,
 } from "@lifecycle/common/build/modules/player";
 import { getDirectionFromInputKeys } from "@lifecycle/common/build/utils/input";
+import { Direction } from "@lifecycle/common/build/types";
+
 import { getValidBodyPosition } from "./map";
+import { Monster } from "./monster";
 
 export const getPlayersPublicData = (
   players: Record<string, Player>
@@ -30,11 +33,15 @@ export class Player {
   lastProcessedInput: number;
   health: number;
   body: matter.Body;
+  direction: Direction;
+  attack: number;
 
   constructor(world: matter.World) {
     this.id = uuidv4();
     this.lastProcessedInput = 0;
     this.health = PLAYER_HEALTH;
+    this.direction = Direction.DOWN;
+    this.attack = 1;
 
     const initialPosition = getValidBodyPosition(world, PLAYER_SIZE);
     this.body = matter.Bodies.rectangle(
@@ -54,32 +61,56 @@ export class Player {
 
   processInput(
     input: TPlayerInput,
-    players: Record<string, Player>,
-    delta: number
+    delta: number,
+    monsters: Record<string, Monster>
   ): void {
-    const newVelocity = getPlayerVelocity({
-      delta,
-      direction: getDirectionFromInputKeys(input.keys),
-    });
-    matter.Body.setVelocity(this.body, newVelocity);
+    const direction = getDirectionFromInputKeys(input.keys);
+
+    if (direction) {
+      this.direction = direction;
+
+      const newVelocity = getPlayerVelocity({
+        delta,
+        direction,
+      });
+      matter.Body.setVelocity(this.body, newVelocity);
+    }
 
     if (input.keys.includes(ECursorKey.SPACE)) {
-      for (const playerId in players) {
-        if (playerId === this.id) continue;
-        // @TODO: Improve code to account for player direction
-        // @TODO: Review attack code (WIP)
-        const player = players[playerId];
-        if (player.body.position) {
-          // use euclidean distance to calculate distance between both players
-          const distance = Math.sqrt(
-            (player.body.position.x - this.body.position.x) ** 2 +
-              (player.body.position.y - this.body.position.y) ** 2
-          );
-          if (distance < 15) {
-            player.health -= 1;
-          }
-        }
-      }
+      // Move collision section based on attack direction
+      const isHorizontalAttack = [Direction.LEFT, Direction.RIGHT].includes(
+        this.direction
+      );
+      const atackCollisionBody = matter.Bodies.rectangle(
+        this.body.position.x +
+          (this.direction === Direction.LEFT
+            ? -PLAYER_SIZE / 2
+            : this.direction === Direction.RIGHT
+            ? PLAYER_SIZE / 2
+            : 0),
+        this.body.position.y +
+          (this.direction === Direction.UP
+            ? -PLAYER_SIZE / 2
+            : this.direction === Direction.DOWN
+            ? PLAYER_SIZE / 2
+            : 0),
+        isHorizontalAttack ? PLAYER_SIZE / 2 : PLAYER_SIZE * 0.75,
+        isHorizontalAttack ? PLAYER_SIZE * 0.75 : PLAYER_SIZE / 2
+      );
+
+      const monstersList = Object.values(monsters);
+
+      const attackedBodies = matter.Query.collides(
+        atackCollisionBody,
+        monstersList.map((monster) => monster.body)
+      );
+
+      attackedBodies.forEach((attackedBody) => {
+        const monster = monstersList.find(
+          (m) => m.body.id === attackedBody.bodyA.id
+        );
+        monster?.dealDamage(this.attack);
+      });
     }
   }
 

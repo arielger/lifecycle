@@ -14,16 +14,13 @@ const MONSTER_SIZE = 16;
 const MONSTER_COUNT = 5;
 
 export function initializeMonsters(
-  world: matter.World
-): Record<string, Monster> {
-  const monsters = {} as Record<string, Monster>;
-
+  world: matter.World,
+  monsters: Record<string, Monster>
+): void {
   [...Array(MONSTER_COUNT)].forEach(() => {
-    const monster = new Monster(world);
+    const monster = new Monster(world, monsters);
     monsters[monster.id] = monster;
   });
-
-  return monsters;
 }
 
 export const getMonstersPublicData = (
@@ -43,13 +40,18 @@ export class Monster {
   id: string;
   health: number;
   body: matter.Body;
+  monsters: Record<string, Monster>;
+  world: matter.World;
 
   lastMovementTimestamp: number;
 
-  constructor(world: matter.World) {
+  constructor(world: matter.World, monsters: Record<string, Monster>) {
     this.id = uuidv4();
     this.health = 4;
     this.lastMovementTimestamp = Date.now();
+
+    this.monsters = monsters;
+    this.world = world;
 
     const initialPosition = getValidBodyPosition(world, MONSTER_SIZE);
     this.body = matter.Bodies.rectangle(
@@ -86,5 +88,18 @@ export class Monster {
       health: this.health,
       position: this.body.position,
     };
+  }
+
+  dealDamage(damage: number): void {
+    this.health -= damage;
+
+    if (this.health <= 0) {
+      this.destroy();
+    }
+  }
+
+  destroy(): void {
+    matter.World.remove(this.world, this.body);
+    delete this.monsters[this.id];
   }
 }
