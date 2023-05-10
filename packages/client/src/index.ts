@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 
 import GameScene from "./scenes/game";
+import MenuScene from "./scenes/menu";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -18,7 +19,7 @@ const config: Phaser.Types.Core.GameConfig = {
     parent: "game",
     autoCenter: Phaser.Scale.CENTER_VERTICALLY,
   },
-  scene: GameScene,
+  scene: [MenuScene, GameScene],
   pixelArt: true,
 };
 

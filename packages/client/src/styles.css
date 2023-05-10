@@ -1,3 +1,8 @@
+@font-face {
+  font-family: "Sabo";
+  src: url('./assets/fonts/Sabo-Filled.otf');
+}
+
 html {
   height: 100%;
   width: 100%;

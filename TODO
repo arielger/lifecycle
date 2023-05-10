@@ -27,6 +27,8 @@ FEATURES
   - [OK] Add monster movement
 - [OK] Improve screen size (remove full screen mode)
 - [OK] Add monsters attacked animation
+- [OK] Add intro screen
+- [ ] Add player hit and death
 - [ ] Add player attack
   - [ ] Add cooldown
   - [ ] Review change of direction while attacking (should update attack sprite)
