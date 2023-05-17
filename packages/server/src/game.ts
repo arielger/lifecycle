@@ -52,7 +52,7 @@ export function startGame(
     inputMessages.forEach(({ playerId, input }) => {
       const player = players[playerId];
       if (player) {
-        player.processInput(input, delta, monsters);
+        player.processInput(input, delta, players, monsters);
         player.lastProcessedInput = input.inputNumber;
       }
     });
@@ -60,7 +60,7 @@ export function startGame(
   });
 
   io.on("connection", (socket) => {
-    const player = new Player(engine.world);
+    const player = new Player(engine.world, players);
     players[player.id] = player;
 
     // Send the player list to the recently connected player with their playerId

@@ -28,7 +28,7 @@ FEATURES
 - [OK] Improve screen size (remove full screen mode)
 - [OK] Add monsters attacked animation
 - [OK] Add intro screen
-- [ ] Add player hit and death
+- [OK] Add player hit and death
 - [ ] Add player attack
   - [ ] Add cooldown
   - [ ] Review change of direction while attacking (should update attack sprite)
@@ -36,6 +36,9 @@ FEATURES
 - [ ] Add entity interpolation
 - [ ] Add chat (?)
 - [ ] Fix depth rendering of players
+- [ ] Should show map when player already has its initial position
+- [ ] Replace hearts container with health bar?
+- [ ] Add sounds
 
 TECH IMPROVEMENTS
 
@@ -43,3 +46,4 @@ TECH IMPROVEMENTS
 - [ ] Add tests?
 - [ ] Auto-build common package (right now you need to build package after changes)
 - [ ] Move to vite - try to fix Parcel cache errors
+- [ ] Compress delta updates sent from server to client

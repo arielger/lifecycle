@@ -23,6 +23,7 @@ export function initializeMonsters(
   });
 }
 
+// @TODO: Duplicated in player entity, check how to share code - DRY
 export const getMonstersPublicData = (
   monsters: Record<string, Monster>
 ): Monsters => {

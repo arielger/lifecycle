@@ -35,13 +35,18 @@ export class Player {
   body: matter.Body;
   direction: Direction;
   attack: number;
+  world: matter.World;
+  players: Record<string, Player>;
 
-  constructor(world: matter.World) {
+  constructor(world: matter.World, players: Record<string, Player>) {
     this.id = uuidv4();
     this.lastProcessedInput = 0;
     this.health = PLAYER_HEALTH;
     this.direction = Direction.DOWN;
     this.attack = 1;
+
+    this.players = players;
+    this.world = world;
 
     const initialPosition = getValidBodyPosition(world, PLAYER_SIZE);
     this.body = matter.Bodies.rectangle(
@@ -62,6 +67,7 @@ export class Player {
   processInput(
     input: TPlayerInput,
     delta: number,
+    players: Record<string, Player>,
     monsters: Record<string, Monster>
   ): void {
     const direction = getDirectionFromInputKeys(input.keys);
@@ -99,17 +105,21 @@ export class Player {
       );
 
       const monstersList = Object.values(monsters);
+      const playersList = Object.values(players).filter(
+        (player) => player.id !== this.id
+      );
+      const entitiesToCheckCollision = [...monstersList, ...playersList];
 
       const attackedBodies = matter.Query.collides(
         atackCollisionBody,
-        monstersList.map((monster) => monster.body)
+        entitiesToCheckCollision.map((monster) => monster.body)
       );
 
       attackedBodies.forEach((attackedBody) => {
-        const monster = monstersList.find(
+        const entity = entitiesToCheckCollision.find(
           (m) => m.body.id === attackedBody.bodyA.id
         );
-        monster?.dealDamage(this.attack);
+        entity?.dealDamage(this.attack);
       });
     }
   }
@@ -124,5 +134,18 @@ export class Player {
       health: this.health,
       lastProcessedInput: this.lastProcessedInput,
     };
+  }
+
+  dealDamage(damage: number): void {
+    this.health -= damage;
+
+    if (this.health <= 0) {
+      this.destroy();
+    }
+  }
+
+  destroy(): void {
+    matter.World.remove(this.world, this.body);
+    delete this.players[this.id];
   }
 }
