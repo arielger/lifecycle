@@ -36,6 +36,7 @@ export default class GameScene extends Phaser.Scene {
   private monstersManager?: MonstersManager;
   private playerId?: string;
   private player?: Player;
+  private isPlayerDead = false;
 
   private heartsUI?: HeartsUI;
 
@@ -93,12 +94,16 @@ export default class GameScene extends Phaser.Scene {
         });
       } else if (update.type === "GAME_STATE") {
         // @TODO: Review => we should be sending deltas of game state
-        this.playersManager?.updatePlayers(update.players);
+        this.playersManager?.updatePlayers({
+          playersUpdate: update.players,
+          isPlayerAlreadyDead: this.isPlayerDead,
+          handlePlayerDeath: this.handlePlayerDeath.bind(this),
+        });
         this.monstersManager?.updateMonsters(update.monsters);
 
         this.heartsUI?.updateHealth(this.player!.health);
 
-        if (gameConfig.serverReconciliation) {
+        if (gameConfig.serverReconciliation && !this.isPlayerDead) {
           const lastProcessedInput =
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             update.players[this.playerId!].lastProcessedInput;
@@ -141,7 +146,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   public update(time: number, delta: number): void {
-    if (!this.player) return;
+    if (!this.player || this.isPlayerDead) return;
 
     const keys: ECursorKey[] = [];
 
@@ -188,5 +193,28 @@ export default class GameScene extends Phaser.Scene {
         }
       }
     }
+  }
+
+  public handlePlayerDeath(): void {
+    this.isPlayerDead = true;
+
+    // @TODO: Move to util
+    const screenCenterX =
+      this.cameras.main.worldView.x + this.cameras.main.width / 2;
+    const screenCenterY =
+      this.cameras.main.worldView.y + this.cameras.main.height / 2;
+
+    const restartButton = this.add
+      .text(screenCenterX, screenCenterY, "Try again", {
+        fontFamily: "Sabo",
+        fontSize: "32px",
+      })
+      .setOrigin(0.5);
+
+    restartButton.setInteractive({ useHandCursor: true });
+
+    restartButton.on("pointerdown", () => {
+      console.log("@TODO: Restart game");
+    });
   }
 }

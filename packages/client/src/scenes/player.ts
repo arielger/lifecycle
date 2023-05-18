@@ -27,6 +27,7 @@ enum EPlayerAnimations {
   ATTACK_UP = "PLAYER_ATTACK_UP",
   ATTACK_LEFT = "PLAYER_ATTACK_LEFT",
   ATTACK_RIGHT = "PLAYER_ATTACK_RIGHT",
+  DEAD = "PLAYER_DEAD",
 }
 
 enum PlayerActions {
@@ -69,26 +70,52 @@ export class PlayersManager {
     }
   }
 
-  updatePlayers(players: TPlayers): void {
-    for (const playerToUpdateId in players) {
-      // @TODO: Improve performance - access player by id using map
-      const [playerToUpdate] = this.players?.getMatching(
-        "id",
-        playerToUpdateId
-      ) as Player[];
+  updatePlayers({
+    playersUpdate,
+    isPlayerAlreadyDead,
+    handlePlayerDeath,
+  }: {
+    playersUpdate: TPlayers;
+    isPlayerAlreadyDead: boolean;
+    handlePlayerDeath: () => void;
+  }): void {
+    (this.players.getChildren() as Player[]).forEach((player) => {
+      const isCurrentPlayer = player.id === this.currentPlayer?.id;
+      const playerUpdate = playersUpdate[player.id];
+      // If there is no update it means the player is dead
+      const isPlayerAlive = !!playerUpdate;
 
-      if (playerToUpdate) {
-        playerToUpdate.health = players[playerToUpdateId].health;
+      if (isCurrentPlayer && isPlayerAlreadyDead) return;
 
-        const newPos = players[playerToUpdateId].position;
-
-        if (playerToUpdateId !== this.currentPlayer?.id) {
-          playerToUpdate.updateAnimation(newPos);
+      if (isPlayerAlive) {
+        // If player is damaged play hit animation
+        if (playerUpdate.health < player.health) {
+          player.hit();
         }
 
-        playerToUpdate.setPosition(newPos.x, newPos.y);
+        player.health = playerUpdate.health;
+
+        // Only update animations for other players (current player animation is already handled)
+        if (!isCurrentPlayer) {
+          player.updateAnimation(playerUpdate.position);
+        }
+
+        player.setPosition(playerUpdate.position.x, playerUpdate.position.y);
+      } else {
+        if (isCurrentPlayer) {
+          // Update health UI
+          player.health = 0;
+
+          player?.playerSprite.play(EPlayerAnimations.DEAD);
+
+          if (player) {
+            handlePlayerDeath();
+          }
+        } else {
+          player.die();
+        }
       }
-    }
+    });
   }
 
   addPlayer(playerId: string, player: TPlayer): void {
@@ -250,6 +277,13 @@ export class Player extends Phaser.GameObjects.Container {
       duration: 300,
       repeat: 0,
     });
+
+    scene.anims.create({
+      key: EPlayerAnimations.DEAD,
+      frames: scene.anims.generateFrameNumbers("skeleton", {
+        frames: [24],
+      }),
+    });
   }
 
   update({ keys, delta }: { keys: ECursorKey[]; delta: number }): void {
@@ -310,5 +344,41 @@ export class Player extends Phaser.GameObjects.Container {
       this.playerSprite.anims.play(EPlayerAnimations.WALK_DOWN, true);
       resetAnimationAndStop(this.playerSprite);
     }
+  }
+
+  hit(): void {
+    this.scene.tweens.addCounter({
+      from: 255,
+      to: 0,
+      duration: 150,
+      yoyo: true,
+      onUpdate: (tween) => {
+        const value = Math.floor(tween.getValue());
+        this.playerSprite.setTint(
+          Phaser.Display.Color.GetColor(255, value, value)
+        );
+      },
+      onComplete: () => {
+        this.playerSprite.clearTint();
+      },
+    });
+  }
+
+  die(): void {
+    this.scene.tweens.addCounter({
+      from: 0,
+      to: 255,
+      duration: 400,
+      onUpdate: (tween) => {
+        const value = Math.floor(tween.getValue());
+        this.playerSprite.setTint(
+          Phaser.Display.Color.GetColor(value, value, value)
+        );
+      },
+      onComplete: () => {
+        this.playerSprite.clearTint();
+        this.destroy();
+      },
+    });
   }
 }

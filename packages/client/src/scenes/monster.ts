@@ -57,7 +57,6 @@ export class MonstersManager {
       }
       if (monsterUpdate.health < monster.health) {
         monster.hit();
-        monster;
       }
       monster.health = monsterUpdate.health;
       monster.updateAnimation(monsterUpdate.position);
