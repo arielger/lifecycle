@@ -36,9 +36,12 @@ export default class GameScene extends Phaser.Scene {
   private monstersManager?: MonstersManager;
   private playerId?: string;
   private player?: Player;
-  private isPlayerDead = false;
+  private gameState: "INITIALIZED" | "GAME_IN_PROCESS" | "GAME_FINISHED" =
+    "INITIALIZED";
 
+  // UI
   private heartsUI?: HeartsUI;
+  private restartOverlay?: Phaser.GameObjects.Text;
 
   private inputSequenceNumber = 0;
   private pendingInputs: TPlayerInput[] = [];
@@ -74,10 +77,18 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
     this.matter.world.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
 
+    // UI
+    this.createRestartOverlay();
+    this.setRestartOverlayVisibility(false);
+
     this.socket.on(ESocketEventNames.GameUpdate, (update) => {
       if (!gameConfig.serverSideProcessing) return;
 
+      // @TODO: Review if its ok to use this to initialize game after restart
       if (update.type === "INITIAL_GAME_STATE") {
+        this.setRestartOverlayVisibility(false);
+
+        this.gameState = "GAME_IN_PROCESS";
         this.playersManager?.initializePlayers(update.playerId, update.players);
         this.monstersManager?.initializeMonsters(update.monsters);
 
@@ -85,6 +96,8 @@ export default class GameScene extends Phaser.Scene {
         this.playerId = update.playerId;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.player = this.playersManager!.currentPlayer!;
+
+        console.log("this.player", this.player);
 
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
 
@@ -96,14 +109,17 @@ export default class GameScene extends Phaser.Scene {
         // @TODO: Review => we should be sending deltas of game state
         this.playersManager?.updatePlayers({
           playersUpdate: update.players,
-          isPlayerAlreadyDead: this.isPlayerDead,
+          isPlayerAlreadyDead: this.gameState === "GAME_FINISHED",
           handlePlayerDeath: this.handlePlayerDeath.bind(this),
         });
         this.monstersManager?.updateMonsters(update.monsters);
 
         this.heartsUI?.updateHealth(this.player!.health);
 
-        if (gameConfig.serverReconciliation && !this.isPlayerDead) {
+        if (
+          gameConfig.serverReconciliation &&
+          this.gameState === "GAME_IN_PROCESS"
+        ) {
           const lastProcessedInput =
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             update.players[this.playerId!].lastProcessedInput;
@@ -146,7 +162,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   public update(time: number, delta: number): void {
-    if (!this.player || this.isPlayerDead) return;
+    if (!this.player || this.gameState !== "GAME_IN_PROCESS") return;
+
+    console.log("update");
 
     const keys: ECursorKey[] = [];
 
@@ -195,26 +213,36 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
-  public handlePlayerDeath(): void {
-    this.isPlayerDead = true;
-
-    // @TODO: Move to util
+  public createRestartOverlay(): void {
     const screenCenterX =
       this.cameras.main.worldView.x + this.cameras.main.width / 2;
     const screenCenterY =
       this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-    const restartButton = this.add
+    this.restartOverlay = this.add
       .text(screenCenterX, screenCenterY, "Try again", {
         fontFamily: "Sabo",
         fontSize: "32px",
       })
       .setOrigin(0.5);
 
-    restartButton.setInteractive({ useHandCursor: true });
+    this.restartOverlay.setInteractive({ useHandCursor: true });
 
-    restartButton.on("pointerdown", () => {
-      console.log("@TODO: Restart game");
+    this.restartOverlay.on("pointerdown", () => {
+      this.restartGame();
     });
+  }
+
+  public setRestartOverlayVisibility(show: boolean): void {
+    this.restartOverlay?.setVisible(show);
+  }
+
+  public handlePlayerDeath(): void {
+    this.gameState = "GAME_FINISHED";
+    this.setRestartOverlayVisibility(true);
+  }
+
+  public restartGame(): void {
+    this.socket!.emit(ESocketEventNames.RestartGame);
   }
 }

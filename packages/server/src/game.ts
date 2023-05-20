@@ -92,6 +92,26 @@ export function startGame(
         input,
       });
     });
+
+    socket.on(ESocketEventNames.RestartGame, () => {
+      const player = new Player(engine.world, players);
+      players[player.id] = player;
+
+      // @TODO: Remove duplicated code
+      socket.emit(ESocketEventNames.GameUpdate, {
+        type: "INITIAL_GAME_STATE",
+        players: getPlayersPublicData(players),
+        monsters: getMonstersPublicData(monsters),
+        playerId: player.id,
+      });
+
+      // Send the new player to the rest of players
+      socket.broadcast.emit(ESocketEventNames.GameUpdate, {
+        type: "PLAYER_JOINED",
+        playerId: player.id,
+        player: player.getPublicData(),
+      });
+    });
   });
 
   createLoop(1000 / UPDATE_LOOP_RATE_PER_SECOND, () => {
