@@ -13,7 +13,7 @@ FEATURES
   - [OK] Server-side collision
 - [OK] Fix crashing on collision (server side?)
 - [OK] Add favicon
-- [ ] Move everything to Matter.js -> Fix collision detection on server reconciliation (client/server)
+- [OK] Move everything to Matter.js -> Fix collision detection on server reconciliation (client/server)
   - [OK] Create map with Matter.js (server-side)
   - [OK] Add world borders (server-side)
   - [OK] Fix player initial position (server-side)
@@ -29,7 +29,8 @@ FEATURES
 - [OK] Add monsters attacked animation
 - [OK] Add intro screen
 - [OK] Add player hit and death
-- [ ] Add player death -> Restart flow
+- [OK] Add player death -> Restart flow
+  - [OK] Review try again text position
 - [ ] Add player attack
   - [ ] Add cooldown
   - [ ] Review change of direction while attacking (should update attack sprite)

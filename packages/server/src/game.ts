@@ -1,5 +1,5 @@
 import matter from "matter-js";
-import { Server as SocketServer } from "socket.io";
+import { Socket, Server as SocketServer } from "socket.io";
 
 import {
   TClientToServerEvents,
@@ -14,6 +14,44 @@ import { Map } from "./map";
 import { createLoop } from "./utils";
 
 const UPDATE_LOOP_RATE_PER_SECOND = 22;
+
+type PlayerMap = Record<string, Player>;
+
+type MonstersMap = Record<string, Monster>;
+
+function handleNewPlayerJoined({
+  engine,
+  socket,
+  players,
+  monsters,
+}: {
+  engine: Matter.Engine;
+  socket: Socket<TClientToServerEvents, TServerToClientEvents>;
+  players: PlayerMap;
+  monsters: MonstersMap;
+}) {
+  const player = new Player(engine.world, players);
+
+  // Add new player to player list
+  players[player.id] = player;
+
+  // Send the player list to the recently connected player with their playerId
+  socket.emit(ESocketEventNames.GameUpdate, {
+    type: "INITIAL_GAME_STATE",
+    players: getPlayersPublicData(players),
+    monsters: getMonstersPublicData(monsters),
+    playerId: player.id,
+  });
+
+  // Send the new player to the rest of players
+  socket.broadcast.emit(ESocketEventNames.GameUpdate, {
+    type: "PLAYER_JOINED",
+    playerId: player.id,
+    player: player.getPublicData(),
+  });
+
+  return player;
+}
 
 export function startGame(
   io: SocketServer<TClientToServerEvents, TServerToClientEvents>
@@ -30,8 +68,8 @@ export function startGame(
   new Map(engine.world);
 
   // Game state
-  const players: Record<string, Player> = {};
-  const monsters: Record<string, Monster> = {};
+  const players: PlayerMap = {};
+  const monsters: MonstersMap = {};
 
   initializeMonsters(engine.world, monsters);
 
@@ -60,22 +98,11 @@ export function startGame(
   });
 
   io.on("connection", (socket) => {
-    const player = new Player(engine.world, players);
-    players[player.id] = player;
-
-    // Send the player list to the recently connected player with their playerId
-    socket.emit(ESocketEventNames.GameUpdate, {
-      type: "INITIAL_GAME_STATE",
-      players: getPlayersPublicData(players),
-      monsters: getMonstersPublicData(monsters),
-      playerId: player.id,
-    });
-
-    // Send the new player to the rest of players
-    socket.broadcast.emit(ESocketEventNames.GameUpdate, {
-      type: "PLAYER_JOINED",
-      playerId: player.id,
-      player: player.getPublicData(),
+    let player = handleNewPlayerJoined({
+      engine,
+      socket,
+      players,
+      monsters,
     });
 
     socket.on("disconnect", () => {
@@ -90,6 +117,15 @@ export function startGame(
       inputMessages.push({
         playerId: player.id,
         input,
+      });
+    });
+
+    socket.on(ESocketEventNames.RestartGame, () => {
+      player = handleNewPlayerJoined({
+        engine,
+        socket,
+        players,
+        monsters,
       });
     });
   });

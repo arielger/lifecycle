@@ -53,6 +53,8 @@ export class PlayersManager {
   }
 
   initializePlayers(currentPlayerId: string, players: TPlayers): void {
+    this.players.clear(true, true);
+
     for (const playerId in players) {
       const player = players[playerId];
       const newPlayer = new Player({

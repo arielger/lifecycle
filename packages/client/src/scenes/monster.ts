@@ -36,6 +36,8 @@ export class MonstersManager {
   }
 
   initializeMonsters(monsters: Monsters): void {
+    this.monsters.clear(true, true);
+
     for (const monsterId in monsters) {
       const monster = monsters[monsterId];
       const newMonster = new Monster({
