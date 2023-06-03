@@ -4,6 +4,7 @@ import {
   TPlayers,
   getPlayerVelocity,
   ECursorKey,
+  EPlayerAction,
 } from "@lifecycle/common/src/modules/player";
 import { Direction } from "@lifecycle/common/src/types";
 import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
@@ -84,6 +85,7 @@ export class PlayersManager {
     (this.players.getChildren() as Player[]).forEach((player) => {
       const isCurrentPlayer = player.id === this.currentPlayer?.id;
       const playerUpdate = playersUpdate[player.id];
+
       // If there is no update it means the player is dead
       const isPlayerAlive = !!playerUpdate;
 
@@ -99,7 +101,7 @@ export class PlayersManager {
 
         // Only update animations for other players (current player animation is already handled)
         if (!isCurrentPlayer) {
-          player.updateAnimation(playerUpdate.position);
+          player.updateAnimation(playerUpdate.position, playerUpdate.action);
         }
 
         player.setPosition(playerUpdate.position.x, playerUpdate.position.y);
@@ -329,13 +331,28 @@ export class Player extends Phaser.GameObjects.Container {
     }
   }
 
-  updateAnimation(newPos: TVector2): void {
+  updateAnimation(newPos: TVector2, action?: EPlayerAction): void {
+    const currentAnimKey = this.playerSprite.anims.currentAnim?.key;
     const direction = getDirectionFromPosition(
       { x: this.x, y: this.y },
       newPos
     );
 
-    if (direction) {
+    if (action === EPlayerAction.ATTACK) {
+      const animDirection =
+        direction || getDirectionFromAnimation(currentAnimKey);
+
+      console.log("animDirection", animDirection);
+
+      this.playerSprite
+        .play(getPlayerAnimation(PlayerActions.ATTACK, animDirection))
+        .once("animationcomplete", () => {
+          this.playerSprite.anims.play(
+            getPlayerAnimation(PlayerActions.WALK, animDirection),
+            true
+          );
+        });
+    } else if (direction) {
       const walkAnimation = getPlayerAnimation(PlayerActions.WALK, direction);
       this.playerSprite.play(walkAnimation, true);
     } else if (

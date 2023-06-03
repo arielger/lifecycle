@@ -21,10 +21,15 @@ export type TPlayerInputMessage = {
   input: TPlayerInput;
 };
 
+export enum EPlayerAction {
+  ATTACK = "ATTACK",
+}
+
 export type TPlayer = {
   position: TVector2;
   lastProcessedInput: number;
   health: number;
+  action?: EPlayerAction;
 };
 
 export type TPlayers = Record<string, TPlayer>;

@@ -42,6 +42,9 @@ FEATURES
 - [ ] Replace hearts container with health bar?
 - [ ] Add sounds
 - [ ] Update typography loading (working only sometimes?)
+- [ ] Change hosting => search for something with 100% uptime + bigger quota
+- [ ] Add player name below character
+- [ ] Add items
 
 TECH IMPROVEMENTS
 

@@ -8,6 +8,7 @@ import {
   PLAYER_SIZE,
   TPlayer,
   getPlayerVelocity,
+  EPlayerAction,
 } from "@lifecycle/common/build/modules/player";
 import { getDirectionFromInputKeys } from "@lifecycle/common/build/utils/input";
 import { Direction } from "@lifecycle/common/build/types";
@@ -35,6 +36,9 @@ export class Player {
   body: matter.Body;
   direction: Direction;
   attack: number;
+  // Store player's action to send it to the client on the next update (for animations)
+  action?: EPlayerAction;
+
   world: matter.World;
   players: Record<string, Player>;
 
@@ -83,6 +87,7 @@ export class Player {
     }
 
     if (input.keys.includes(ECursorKey.SPACE)) {
+      this.action = EPlayerAction.ATTACK;
       // Move collision section based on attack direction
       const isHorizontalAttack = [Direction.LEFT, Direction.RIGHT].includes(
         this.direction
@@ -129,10 +134,12 @@ export class Player {
       x: this.body.position.x,
       y: this.body.position.y,
     };
+
     return {
       position,
       health: this.health,
       lastProcessedInput: this.lastProcessedInput,
+      action: this.action,
     };
   }
 
