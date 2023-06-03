@@ -32,6 +32,7 @@ FEATURES
 - [OK] Add player death -> Restart flow
   - [OK] Review try again text position
 - [ ] Add player attack
+  - [ ] Add attack animation for all players
   - [ ] Add cooldown
   - [ ] Review change of direction while attacking (should update attack sprite)
 - [ ] Review client side prediction (there are still some weird movements not involving collisions)
@@ -42,6 +43,9 @@ FEATURES
 - [ ] Replace hearts container with health bar?
 - [ ] Add sounds
 - [ ] Update typography loading (working only sometimes?)
+- [ ] Change hosting => search for something with 100% uptime + bigger quota
+- [ ] Add player name below character
+- [ ] Add items
 
 TECH IMPROVEMENTS
 

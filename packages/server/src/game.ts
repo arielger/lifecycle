@@ -136,5 +136,11 @@ export function startGame(
       players: getPlayersPublicData(players),
       monsters: getMonstersPublicData(monsters),
     });
+
+    // Restart player action animation key after each game update
+    Object.keys(players).forEach((playerId) => {
+      const player = players[playerId];
+      player.action = undefined;
+    });
   });
 }

@@ -4,6 +4,7 @@ import {
   TPlayers,
   getPlayerVelocity,
   ECursorKey,
+  EPlayerAction,
 } from "@lifecycle/common/src/modules/player";
 import { Direction } from "@lifecycle/common/src/types";
 import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
@@ -84,6 +85,7 @@ export class PlayersManager {
     (this.players.getChildren() as Player[]).forEach((player) => {
       const isCurrentPlayer = player.id === this.currentPlayer?.id;
       const playerUpdate = playersUpdate[player.id];
+
       // If there is no update it means the player is dead
       const isPlayerAlive = !!playerUpdate;
 
@@ -99,7 +101,13 @@ export class PlayersManager {
 
         // Only update animations for other players (current player animation is already handled)
         if (!isCurrentPlayer) {
-          player.updateAnimation(playerUpdate.position);
+          player.updateAnimation({
+            startAttack: !!(playerUpdate.action === EPlayerAction.ATTACK),
+            inputMovementDirection: getDirectionFromPosition(
+              { x: player.x, y: player.y },
+              playerUpdate.position
+            ),
+          });
         }
 
         player.setPosition(playerUpdate.position.x, playerUpdate.position.y);
@@ -289,62 +297,64 @@ export class Player extends Phaser.GameObjects.Container {
   }
 
   update({ keys, delta }: { keys: ECursorKey[]; delta: number }): void {
-    // Animation
-    const currentAnimKey = this.playerSprite.anims.currentAnim?.key;
-    const movementInputDirection = getDirectionFromInputKeys(keys);
+    const inputMovementDirection = getDirectionFromInputKeys(keys);
 
-    const startAttack = keys.includes(ECursorKey.SPACE);
-
-    if (startAttack) {
-      // @TODO: Review change of direction while attacking (should update attack sprite)
-      const animDirection =
-        movementInputDirection || getDirectionFromAnimation(currentAnimKey);
-
-      this.playerSprite
-        .play(getPlayerAnimation(PlayerActions.ATTACK, animDirection))
-        .once("animationcomplete", () => {
-          this.playerSprite.anims.play(
-            getPlayerAnimation(PlayerActions.WALK, animDirection),
-            true
-          );
-        });
-    } else if (
-      movementInputDirection &&
-      !currentAnimKey.includes(PlayerActions.ATTACK)
-    ) {
-      this.playerSprite.play(
-        getPlayerAnimation(PlayerActions.WALK, movementInputDirection),
-        true
-      );
-    } else if (currentAnimKey.includes(PlayerActions.WALK)) {
-      resetAnimationAndStop(this.playerSprite);
-    }
+    this.updateAnimation({
+      startAttack: keys.includes(ECursorKey.SPACE),
+      inputMovementDirection,
+    });
 
     if (gameConfig.clientSidePrediction) {
       const newVelocity = getPlayerVelocity({
         delta,
-        direction: movementInputDirection,
+        direction: inputMovementDirection,
       });
       this.scene.matter.setVelocity(this.body, newVelocity.x, newVelocity.y);
     }
   }
 
-  updateAnimation(newPos: TVector2): void {
-    const direction = getDirectionFromPosition(
-      { x: this.x, y: this.y },
-      newPos
-    );
+  // Handle animations for both current player and other players
+  updateAnimation({
+    startAttack,
+    inputMovementDirection,
+  }: {
+    startAttack: boolean;
+    inputMovementDirection?: Direction;
+  }): void {
+    const currentAnimKey = this.playerSprite.anims.currentAnim?.key;
 
-    if (direction) {
-      const walkAnimation = getPlayerAnimation(PlayerActions.WALK, direction);
-      this.playerSprite.play(walkAnimation, true);
-    } else if (
-      this.playerSprite.anims.currentAnim?.key.includes(PlayerActions.WALK)
+    if (startAttack) {
+      const animDirection =
+        inputMovementDirection || getDirectionFromAnimation(currentAnimKey);
+
+      this.playerSprite
+        .play(getPlayerAnimation(PlayerActions.ATTACK, animDirection))
+        .once("animationcomplete", () => {
+          // When the attack animation ends return to the walk animation
+          this.playerSprite.anims.play(
+            getPlayerAnimation(PlayerActions.WALK, animDirection),
+            true
+          );
+        });
+      return;
+    }
+
+    // If player is moving and not attacking, play WALK animation
+    if (
+      inputMovementDirection &&
+      !currentAnimKey.includes(PlayerActions.ATTACK)
     ) {
+      this.playerSprite.play(
+        getPlayerAnimation(PlayerActions.WALK, inputMovementDirection),
+        true
+      );
+      return;
+    }
+
+    // If player is not moving, stop the current WALK animation
+    if (currentAnimKey.includes(PlayerActions.WALK)) {
       resetAnimationAndStop(this.playerSprite);
-    } else {
-      this.playerSprite.anims.play(EPlayerAnimations.WALK_DOWN, true);
-      resetAnimationAndStop(this.playerSprite);
+      return;
     }
   }
 
