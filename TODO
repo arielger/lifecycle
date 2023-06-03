@@ -31,14 +31,14 @@ FEATURES
 - [OK] Add player hit and death
 - [OK] Add player death -> Restart flow
   - [OK] Review try again text position
+- [OK] Fix depth rendering of players
 - [ ] Add player attack
-  - [ ] Add attack animation for all players
+  - [OK] Add attack animation for all players
   - [ ] Add cooldown
   - [ ] Review change of direction while attacking (should update attack sprite)
 - [ ] Review client side prediction (there are still some weird movements not involving collisions)
 - [ ] Add entity interpolation
 - [ ] Add chat (?)
-- [ ] Fix depth rendering of players
 - [ ] Should show map only when player already has its initial position
 - [ ] Replace hearts container with health bar?
 - [ ] Add sounds

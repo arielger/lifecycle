@@ -111,6 +111,7 @@ export class PlayersManager {
         }
 
         player.setPosition(playerUpdate.position.x, playerUpdate.position.y);
+        player.setDepth(playerUpdate.position.y);
       } else {
         if (isCurrentPlayer) {
           // Update health UI
@@ -297,6 +298,9 @@ export class Player extends Phaser.GameObjects.Container {
   }
 
   update({ keys, delta }: { keys: ECursorKey[]; delta: number }): void {
+    // Set correct depth rendering depending on y position
+    this.setDepth(this.body.position.y);
+
     const inputMovementDirection = getDirectionFromInputKeys(keys);
 
     this.updateAnimation({
