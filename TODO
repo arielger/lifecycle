@@ -32,15 +32,17 @@ FEATURES
 - [OK] Add player death -> Restart flow
   - [OK] Review try again text position
 - [OK] Fix depth rendering of players
+- [ ] Replace hearts container with health bar
+  - [ ] Finish repository health bar
 - [ ] Add player attack
   - [OK] Add attack animation for all players
   - [ ] Add cooldown
   - [ ] Review change of direction while attacking (should update attack sprite)
+- [ ] Add server error handling
 - [ ] Review client side prediction (there are still some weird movements not involving collisions)
 - [ ] Add entity interpolation
 - [ ] Add chat (?)
 - [ ] Should show map only when player already has its initial position
-- [ ] Replace hearts container with health bar?
 - [ ] Add sounds
 - [ ] Update typography loading (working only sometimes?)
 - [ ] Change hosting => search for something with 100% uptime + bigger quota

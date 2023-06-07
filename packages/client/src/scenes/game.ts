@@ -13,12 +13,12 @@ import {
 } from "@lifecycle/common/src/modules/player";
 import { MAP_SIZE } from "@lifecycle/common/src/modules/map";
 import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
-import { gameConfig } from "./gui";
 
 import { Player, PlayersManager } from "./player";
 import { Monster, MonstersManager } from "./monster";
 import { preloadMapAssets, createMap } from "./map";
-import { HeartsUI } from "./hearts";
+import { HealthBarUI } from "./ui/healthbar";
+import { gameConfig } from "./ui/config";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -46,7 +46,7 @@ export default class GameScene extends Phaser.Scene {
     "INITIALIZED";
 
   // UI
-  private heartsUI?: HeartsUI;
+  private healthBarUI?: HealthBarUI;
   private restartOverlay?: Phaser.GameObjects.Text;
 
   private inputSequenceNumber = 0;
@@ -59,7 +59,7 @@ export default class GameScene extends Phaser.Scene {
   public preload(): void {
     Player.preloadAssets(this);
     Monster.preloadAssets(this);
-    HeartsUI.preloadAssets(this);
+    HealthBarUI.preloadAssets(this);
     preloadMapAssets(this);
   }
 
@@ -103,7 +103,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
 
-        this.heartsUI = new HeartsUI({
+        this.healthBarUI = new HealthBarUI({
           scene: this,
           health: this.player.health,
         });
@@ -116,7 +116,7 @@ export default class GameScene extends Phaser.Scene {
         });
         this.monstersManager?.updateMonsters(update.monsters);
 
-        this.heartsUI?.updateHealth(this.player!.health);
+        this.healthBarUI?.updateHealth(this.player!.health);
 
         if (
           gameConfig.serverReconciliation &&

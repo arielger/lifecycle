@@ -4,7 +4,8 @@ import matter from "matter-js";
 import {
   TPlayerInput,
   ECursorKey,
-  PLAYER_HEALTH,
+  PLAYER_INITIAL_HEALTH,
+  PLAYER_INITIAL_ATTACK,
   PLAYER_SIZE,
   TPlayer,
   getPlayerVelocity,
@@ -45,9 +46,9 @@ export class Player {
   constructor(world: matter.World, players: Record<string, Player>) {
     this.id = uuidv4();
     this.lastProcessedInput = 0;
-    this.health = PLAYER_HEALTH;
     this.direction = Direction.DOWN;
-    this.attack = 1;
+    this.health = PLAYER_INITIAL_HEALTH;
+    this.attack = PLAYER_INITIAL_ATTACK;
 
     this.players = players;
     this.world = world;

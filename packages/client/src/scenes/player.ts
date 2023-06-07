@@ -16,7 +16,7 @@ import {
   resetAnimationAndStop,
   getDirectionFromPosition,
 } from "../utils/animations";
-import { gameConfig } from "./gui";
+import { gameConfig } from "./ui/config";
 
 // Animations
 enum EPlayerAnimations {
