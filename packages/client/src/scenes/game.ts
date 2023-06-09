@@ -103,10 +103,13 @@ export default class GameScene extends Phaser.Scene {
 
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
 
-        this.healthBarUI = new HealthBarUI({
-          scene: this,
-          health: this.player.health,
-        });
+        // If game is restarting we shouldn't initialize the healthbar again
+        if (!this.healthBarUI) {
+          this.healthBarUI = new HealthBarUI({
+            scene: this,
+            health: this.player.health,
+          });
+        }
       } else if (update.type === "GAME_STATE") {
         // @TODO: Review => we should be sending deltas of game state
         this.playersManager?.updatePlayers({

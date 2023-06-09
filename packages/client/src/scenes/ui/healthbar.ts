@@ -23,6 +23,7 @@ export class HealthBarUI {
   healthBarContainer: Phaser.GameObjects.Container;
   healthFill: Phaser.GameObjects.Image;
   currentHealth: number;
+  healthBarShakeTween: Phaser.Tweens.Tween | undefined;
 
   scene: Phaser.Scene;
 
@@ -70,25 +71,36 @@ export class HealthBarUI {
   updateHealth(health: number): void {
     const healthDifference = health - this.currentHealth;
     if (healthDifference === 0) return;
-
     this.currentHealth = health;
 
-    const healthPercentage = health / PLAYER_INITIAL_HEALTH; // If we are adding more health, we need to update this
+    // If we are adding more health, we need to update this
+    const healthFillDisplayWidth =
+      (health / PLAYER_INITIAL_HEALTH) * HEALTH_BAR_WIDTH;
 
-    this.scene.tweens.add({
-      targets: this.healthBarContainer,
-      x: this.healthBarContainer.x + 2, // Shake the object horizontally
-      duration: 40,
-      repeat: 4,
-      yoyo: true, // Reverse the animation back to the original position
-      ease: "Sine.easeInOut",
-    });
+    if (healthDifference < 0) {
+      // Prevent running tween if its not finished - it might cause healthbar to change final position
+      if (this.scene.tweens.isTweening(this.healthBarContainer)) {
+        this.healthBarShakeTween?.restart();
+      } else {
+        this.healthBarShakeTween = this.scene.tweens.add({
+          targets: this.healthBarContainer,
+          x: this.healthBarContainer.x + 2, // Shake the object horizontally
+          duration: 40,
+          repeat: 4,
+          yoyo: true, // Reverse the animation back to the original position
+          ease: "Sine.easeInOut",
+        });
+      }
 
-    this.scene.tweens.add({
-      targets: [this.healthFill],
-      displayWidth: healthPercentage * HEALTH_BAR_WIDTH,
-      duration: 200,
-      ease: "Sine.easeInOut",
-    });
+      this.scene.tweens.add({
+        targets: [this.healthFill],
+        displayWidth: healthFillDisplayWidth,
+        duration: 200,
+        ease: "Sine.easeInOut",
+      });
+    } else {
+      // Don't run animation if player is healing
+      this.healthFill.displayWidth = healthFillDisplayWidth;
+    }
   }
 }
