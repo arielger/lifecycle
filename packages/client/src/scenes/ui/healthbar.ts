@@ -18,9 +18,9 @@ const sizes = {
 };
 const healthBarLeft =
   sizes.containerMargin + sizes.heartWidth + sizes.healthBarLeftMargin;
-const healthFillLeft = healthBarLeft + sizes.healthFillLeftMargin;
 
 export class HealthBarUI {
+  healthBarContainer: Phaser.GameObjects.Container;
   healthFill: Phaser.GameObjects.Image;
   currentHealth: number;
 
@@ -32,20 +32,27 @@ export class HealthBarUI {
       .setOrigin(0, 0)
       .setScrollFactor(0, 0);
 
-    scene.add
-      .image(healthBarLeft, sizes.containerMargin + 1, "health-bar-container")
+    this.healthBarContainer = scene.add.container(
+      healthBarLeft,
+      sizes.containerMargin + 1
+    );
+
+    const healthBar = scene.add
+      .image(0, 0, "health-bar-container")
       .setOrigin(0, 0)
       .setScrollFactor(0, 0);
 
     this.healthFill = scene.add
       .image(
-        healthFillLeft,
-        sizes.containerMargin + sizes.healthFillTopMargin + 1,
+        sizes.healthFillLeftMargin,
+        sizes.healthFillTopMargin,
         "health-fill"
       )
       .setOrigin(0, 0)
       .setScrollFactor(0, 0);
     this.healthFill.displayWidth = HEALTH_BAR_WIDTH;
+
+    this.healthBarContainer.add([healthBar, this.healthFill]);
 
     this.currentHealth = health;
     this.scene = scene;
@@ -67,6 +74,15 @@ export class HealthBarUI {
     this.currentHealth = health;
 
     const healthPercentage = health / PLAYER_INITIAL_HEALTH; // If we are adding more health, we need to update this
+
+    this.scene.tweens.add({
+      targets: this.healthBarContainer,
+      x: this.healthBarContainer.x + 2, // Shake the object horizontally
+      duration: 40,
+      repeat: 4,
+      yoyo: true, // Reverse the animation back to the original position
+      ease: "Sine.easeInOut",
+    });
 
     this.scene.tweens.add({
       targets: [this.healthFill],
