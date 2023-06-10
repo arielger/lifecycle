@@ -1040,6 +1040,16 @@
     "@parcel/utils" "2.8.3"
     posthtml "^0.16.4"
 
+"@parcel/packager-xml@2.8.3":
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/@parcel/packager-xml/-/packager-xml-2.8.3.tgz#658787349e1cd7de3eed99759cb4593512da125d"
+  integrity sha512-uzxwOyhr8OV7WWEYWK+Qu7EVaHNKMAKxYUqDy3yhzdo/n7bfhy9TSQMWCVuTtnNVOrG2n87+X0ywHkpyTQqIvQ==
+  dependencies:
+    "@parcel/plugin" "2.8.3"
+    "@parcel/types" "2.8.3"
+    "@parcel/utils" "2.8.3"
+    "@xmldom/xmldom" "^0.7.5"
+
 "@parcel/plugin@2.8.3":
   version "2.8.3"
   resolved "https://registry.yarnpkg.com/@parcel/plugin/-/plugin-2.8.3.tgz#7bb30a5775eaa6473c27f002a0a3ee7308d6d669"
@@ -1250,6 +1260,14 @@
     posthtml-parser "^0.10.1"
     posthtml-render "^3.0.0"
     semver "^5.7.1"
+
+"@parcel/transformer-xml@2.8.3":
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/@parcel/transformer-xml/-/transformer-xml-2.8.3.tgz#5263a631994904b45194b9b01be2bf922a7fb872"
+  integrity sha512-9G8muoc//fIAIevhfyIcLh/7knqF0EPRHLimCGhdCaVyD/1a9abaaCvij78Uq7KYME+5xneIdML4YnLj1J/3nA==
+  dependencies:
+    "@parcel/plugin" "2.8.3"
+    "@xmldom/xmldom" "^0.7.5"
 
 "@parcel/types@2.8.3":
   version "2.8.3"
@@ -1560,6 +1578,11 @@
   dependencies:
     "@typescript-eslint/types" "4.28.2"
     eslint-visitor-keys "^2.0.0"
+
+"@xmldom/xmldom@^0.7.5":
+  version "0.7.11"
+  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.7.11.tgz#adecc134521274711d071d5b0200907cc83b38ee"
+  integrity sha512-UDi3g6Jss/W5FnSzO9jCtQwEpfymt0M+sPPlmLhDH6h2TJ8j4ESE/LpmNPBij15J5NKkk4/cg/qoVMdWI3vnlQ==
 
 "@yarnpkg/lockfile@^1.1.0":
   version "1.1.0"

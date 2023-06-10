@@ -33,7 +33,6 @@ FEATURES
   - [OK] Review try again text position
 - [OK] Fix depth rendering of players
 - [ ] Replace hearts container with health bar
-  - [ ] Finish repository health bar
 - [ ] Add player attack
   - [OK] Add attack animation for all players
   - [ ] Add cooldown

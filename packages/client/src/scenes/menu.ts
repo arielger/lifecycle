@@ -1,5 +1,10 @@
 import Phaser from "phaser";
 
+import MonogramFontPNG from "url:../assets/fonts/monogram.png";
+import MonogramFontXML from "url:../assets/fonts/monogram.xml";
+import { getScreenCenter } from "../utils/text";
+import { GameAssets } from "../types";
+
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
   visible: false,
@@ -11,26 +16,36 @@ export default class GameScene extends Phaser.Scene {
     super(sceneConfig);
   }
 
-  public create(): void {
-    const screenCenterX =
-      this.cameras.main.worldView.x + this.cameras.main.width / 2;
-    const screenCenterY =
-      this.cameras.main.worldView.y + this.cameras.main.height / 2;
+  public preload(): void {
+    this.load.bitmapFont(
+      GameAssets.TYPOGRAPHY,
+      MonogramFontPNG,
+      MonogramFontXML
+    );
+  }
 
-    const titleText = this.add
-      .text(screenCenterX, screenCenterY, "Lifecycle", {
-        fontFamily: "Sabo",
-        fontSize: "32px",
-      })
-      .setOrigin(0.5);
+  public create(): void {
+    const screenCenter = getScreenCenter(this);
+
+    this.add
+      .bitmapText(
+        screenCenter.x,
+        screenCenter.y,
+        GameAssets.TYPOGRAPHY,
+        "PIXELCYCLE"
+      )
+      .setOrigin(0.5)
+      .setTintFill(0xffffff);
 
     const startButton = this.add
-      .text(screenCenterX, screenCenterY + 50, "Start", {
-        fontFamily: "Sabo",
-        fontSize: "16px",
-        color: "#ffe724",
-      })
-      .setOrigin(0.5);
+      .bitmapText(
+        screenCenter.x,
+        screenCenter.y + 30,
+        GameAssets.TYPOGRAPHY,
+        "START"
+      )
+      .setOrigin(0.5)
+      .setTintFill(0xffff00);
 
     startButton.setInteractive({ useHandCursor: true });
 

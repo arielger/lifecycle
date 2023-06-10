@@ -19,6 +19,8 @@ import { Monster, MonstersManager } from "./monster";
 import { preloadMapAssets, createMap } from "./map";
 import { HealthBarUI } from "./ui/healthbar";
 import { gameConfig } from "./ui/config";
+import { getScreenCenter } from "../utils/text";
+import { GameAssets } from "../types";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -47,7 +49,7 @@ export default class GameScene extends Phaser.Scene {
 
   // UI
   private healthBarUI?: HealthBarUI;
-  private restartOverlay?: Phaser.GameObjects.Text;
+  private restartOverlay?: Phaser.GameObjects.BitmapText;
 
   private inputSequenceNumber = 0;
   private pendingInputs: TPlayerInput[] = [];
@@ -217,18 +219,18 @@ export default class GameScene extends Phaser.Scene {
   }
 
   public createRestartOverlay(): void {
-    const screenCenterX =
-      this.cameras.main.worldView.x + this.cameras.main.width / 2;
-    const screenCenterY =
-      this.cameras.main.worldView.y + this.cameras.main.height / 2;
+    const screenCenter = getScreenCenter(this);
 
     this.restartOverlay = this.add
-      .text(screenCenterX, screenCenterY, "Try again", {
-        fontFamily: "Sabo",
-        fontSize: "32px",
-      })
+      .bitmapText(
+        screenCenter.x,
+        screenCenter.y,
+        GameAssets.TYPOGRAPHY,
+        "TRY AGAIN"
+      )
       .setOrigin(0.5)
-      .setScrollFactor(0, 0);
+      .setScrollFactor(0, 0)
+      .setDepth(99999);
 
     this.restartOverlay.setInteractive({ useHandCursor: true });
 
