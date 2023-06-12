@@ -3,19 +3,22 @@ import healthBarContainer from "url:../../assets/ui/health-container.png";
 import healthFill from "url:../../assets/ui/health-fill.png";
 
 import { PLAYER_INITIAL_HEALTH } from "@lifecycle/common/src/modules/player";
-
-const HEALTH_BAR_WIDTH = 68; // Based on health bar image (76px total - 6px from margins)
+import { GameAssets } from "../../types";
 
 const sizes = {
   // General health bar margin
   containerMargin: 2,
   heartWidth: 16,
   // Space between heart and health bar
-  healthBarLeftMargin: 2,
+  healthBarLeftMargin: 3,
   // Distances from start of the health bar to the position of the health fill
-  healthFillTopMargin: 3,
-  healthFillLeftMargin: 4,
+  healthFillTopMargin: 1,
+  healthFillLeftMargin: 1,
 };
+
+const HEALTH_BAR_WIDTH = 70;
+const HEALTH_BAR_FILL_WIDTH = HEALTH_BAR_WIDTH - sizes.healthFillLeftMargin * 2;
+
 const healthBarLeft =
   sizes.containerMargin + sizes.heartWidth + sizes.healthBarLeftMargin;
 
@@ -24,6 +27,7 @@ export class HealthBarUI {
   healthFill: Phaser.GameObjects.Image;
   currentHealth: number;
   healthBarShakeTween: Phaser.Tweens.Tween | undefined;
+  healthText: Phaser.GameObjects.BitmapText;
 
   scene: Phaser.Scene;
 
@@ -51,9 +55,21 @@ export class HealthBarUI {
       )
       .setOrigin(0, 0)
       .setScrollFactor(0, 0);
-    this.healthFill.displayWidth = HEALTH_BAR_WIDTH;
+    this.healthFill.displayWidth = HEALTH_BAR_FILL_WIDTH;
 
-    this.healthBarContainer.add([healthBar, this.healthFill]);
+    this.healthText = scene.add
+      .bitmapText(
+        HEALTH_BAR_FILL_WIDTH / 2,
+        -3,
+        GameAssets.TYPOGRAPHY,
+        `${PLAYER_INITIAL_HEALTH}/${PLAYER_INITIAL_HEALTH}`
+      )
+      .setScrollFactor(0, 0)
+      .setScale(0.5)
+      .setOrigin(0.5, 0)
+      .setTintFill(0xffffff);
+
+    this.healthBarContainer.add([healthBar, this.healthFill, this.healthText]);
 
     this.currentHealth = health;
     this.scene = scene;
@@ -75,7 +91,9 @@ export class HealthBarUI {
 
     // If we are adding more health, we need to update this
     const healthFillDisplayWidth =
-      (health / PLAYER_INITIAL_HEALTH) * HEALTH_BAR_WIDTH;
+      (health / PLAYER_INITIAL_HEALTH) * HEALTH_BAR_FILL_WIDTH;
+
+    this.healthText.setText(`${health}/${PLAYER_INITIAL_HEALTH}`);
 
     if (healthDifference < 0) {
       // Prevent running tween if its not finished - it might cause healthbar to change final position
