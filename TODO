@@ -2,54 +2,28 @@ TODO:
 
 FEATURES
 
-- [OK] Add animation/sprites for other players
-- [OK] Make map bigger
-- [OK] Add camera that follows the player
-  - [OK] Add server collision checking for world borders
-- [OK] Add README.md with project info
-- [OK] Improve sprites collision detection (collision with some parts of the tile only)
-  - [OK] Client-side
-  - [OK] Add collision shapes to map
-  - [OK] Server-side collision
-- [OK] Fix crashing on collision (server side?)
-- [OK] Add favicon
-- [OK] Move everything to Matter.js -> Fix collision detection on server reconciliation (client/server)
-  - [OK] Create map with Matter.js (server-side)
-  - [OK] Add world borders (server-side)
-  - [OK] Fix player initial position (server-side)
-  - [OK] Fix timestep client/server - review movement code
-  - [OK] Review server reconciliation code (client-side) -> Hacky solution: don't send input if player is colliding
-  - [OK] Review server collision handling -> player moving around obstacles (not in client)
-    -> Check PhaserJS physics configuration
-    -> Also player can't access narrow spaces
-- [OK] Add hearth containers
-- [OK] Add monster
-  - [OK] Add monster movement
-- [OK] Improve screen size (remove full screen mode)
-- [OK] Add monsters attacked animation
-- [OK] Add intro screen
-- [OK] Add player hit and death
-- [OK] Add player death -> Restart flow
-  - [OK] Review try again text position
-- [OK] Fix depth rendering of players
-- [ ] Replace hearts container with health bar
-- [ ] Add player attack
-  - [OK] Add attack animation for all players
-  - [ ] Add cooldown
-  - [ ] Review change of direction while attacking (should update attack sprite)
-- [ ] Add server error handling
+- [ ] Make bigger map (to check different resolutions to fix text resolution bug + pixel art)
+- [ ] Add player name + show it below character
+- [ ] Show amount of players in game
+- [ ] Add game log
+  - [ ] Player killed x player
+- [ ] Add attack cooldown (client + server)
 - [ ] Review client side prediction (there are still some weird movements not involving collisions)
 - [ ] Add entity interpolation
-- [ ] Add chat (?)
-- [ ] Should show map only when player already has its initial position
+- [ ] Add chat
 - [ ] Add sounds
-- [ ] Update typography loading (working only sometimes?)
-- [ ] Change hosting => search for something with 100% uptime + bigger quota
-- [ ] Add player name below character
 - [ ] Add items
+- [ ] Add different types of characters
+
+BUG FIXING
+
+- [ ] Should show map only when player already has its initial position
+- [ ] Review change of direction while attacking (should update attack sprite)
 
 TECH IMPROVEMENTS
 
+- [ ] Change hosting => search for something with 100% uptime + bigger quota
+- [ ] Add server error handling
 - [ ] Add eslint on ci/cd
 - [ ] Add tests?
 - [ ] Auto-build common package (right now you need to build package after changes)

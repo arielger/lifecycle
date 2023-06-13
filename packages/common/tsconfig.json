@@ -7,9 +7,10 @@
     "outDir": "./build",
     "module": "commonjs",
     "moduleResolution": "node",
-    "composite": true,
+    // "composite": true,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true
   }
 }

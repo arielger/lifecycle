@@ -1,4 +1,6 @@
+import map from "./map.json";
+
 export const MAP_SIZE = {
-  width: 480,
-  height: 480,
+  width: map.width * map.tilewidth,
+  height: map.height * map.tileheight,
 };
