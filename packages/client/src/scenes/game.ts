@@ -14,19 +14,24 @@ import {
 import { MAP_SIZE } from "@lifecycle/common/src/modules/map";
 import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
 
+import { resolution } from "../config";
 import { Player, PlayersManager } from "./player";
 import { Monster, MonstersManager } from "./monster";
 import { preloadMapAssets, createMap } from "./map";
-import { HealthBarUI } from "./ui/healthbar";
 import { gameConfig } from "./ui/config";
 import { getScreenCenter } from "../utils/text";
-import { GameAssets } from "../types";
+import { GameAssets, Scenes } from "../types";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
+  key: Scenes.GAME,
   active: false,
   visible: false,
-  key: "Game",
 };
+
+export enum GameSceneEvents {
+  INITIALIZE_HEALTHBAR = "INITIALIZE_HEALTHBAR",
+  UPDATE_HEALTH_VALUE = "UPDATE_HEALTH_VALUE",
+}
 
 export default class GameScene extends Phaser.Scene {
   private socket?: Socket<TServerToClientEvents, TClientToServerEvents>;
@@ -48,7 +53,6 @@ export default class GameScene extends Phaser.Scene {
     "INITIALIZED";
 
   // UI
-  private healthBarUI?: HealthBarUI;
   private restartOverlay?: Phaser.GameObjects.BitmapText;
 
   private inputSequenceNumber = 0;
@@ -61,7 +65,6 @@ export default class GameScene extends Phaser.Scene {
   public preload(): void {
     Player.preloadAssets(this);
     Monster.preloadAssets(this);
-    HealthBarUI.preloadAssets(this);
     preloadMapAssets(this);
   }
 
@@ -83,6 +86,9 @@ export default class GameScene extends Phaser.Scene {
     // Map configuration
     createMap(this);
     this.cameras.main.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
+    // @TODO: Review this solution => are we doing more
+    // graphic processing when increasing resolution and adding zoom?
+    this.cameras.main.setZoom(resolution.zoom);
     this.matter.world.setBounds(0, 0, MAP_SIZE.width, MAP_SIZE.height);
 
     // UI
@@ -105,13 +111,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
 
-        // If game is restarting we shouldn't initialize the healthbar again
-        if (!this.healthBarUI) {
-          this.healthBarUI = new HealthBarUI({
-            scene: this,
-            health: this.player.health,
-          });
-        }
+        this.events.emit(GameSceneEvents.INITIALIZE_HEALTHBAR);
       } else if (update.type === "GAME_STATE") {
         // @TODO: Review => we should be sending deltas of game state
         this.playersManager?.updatePlayers({
@@ -121,7 +121,10 @@ export default class GameScene extends Phaser.Scene {
         });
         this.monstersManager?.updateMonsters(update.monsters);
 
-        this.healthBarUI?.updateHealth(this.player!.health);
+        this.events.emit(
+          GameSceneEvents.UPDATE_HEALTH_VALUE,
+          this.player!.health
+        );
 
         if (
           gameConfig.serverReconciliation &&

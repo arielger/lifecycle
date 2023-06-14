@@ -30,6 +30,7 @@ export type TPlayer = {
   lastProcessedInput: number;
   health: number;
   action?: EPlayerAction;
+  name: string;
 };
 
 export type TPlayers = Record<string, TPlayer>;

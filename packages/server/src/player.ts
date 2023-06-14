@@ -16,6 +16,7 @@ import { Direction } from "@lifecycle/common/build/types";
 
 import { getValidBodyPosition } from "./map";
 import { Monster } from "./monster";
+import { getRandom } from "@lifecycle/common/build/utils/arrays";
 
 export const getPlayersPublicData = (
   players: Record<string, Player>
@@ -37,6 +38,7 @@ export class Player {
   body: matter.Body;
   direction: Direction;
   attack: number;
+  name: string;
   // Store player's action to send it to the client on the next update (for animations)
   action?: EPlayerAction;
 
@@ -49,6 +51,7 @@ export class Player {
     this.direction = Direction.DOWN;
     this.health = PLAYER_INITIAL_HEALTH;
     this.attack = PLAYER_INITIAL_ATTACK;
+    this.name = getRandom(["jose", "mati", "chicho", "tato", "lilo", "ariel"]);
 
     this.players = players;
     this.world = world;
@@ -141,6 +144,7 @@ export class Player {
       health: this.health,
       lastProcessedInput: this.lastProcessedInput,
       action: this.action,
+      name: this.name,
     };
   }
 

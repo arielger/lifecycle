@@ -3,12 +3,12 @@ import Phaser from "phaser";
 import MonogramFontPNG from "url:../assets/fonts/monogram.png";
 import MonogramFontXML from "url:../assets/fonts/monogram.xml";
 import { getScreenCenter } from "../utils/text";
-import { GameAssets } from "../types";
+import { GameAssets, Scenes } from "../types";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
   visible: false,
-  key: "Menu",
+  key: Scenes.MENU,
 };
 
 export default class GameScene extends Phaser.Scene {
@@ -50,7 +50,8 @@ export default class GameScene extends Phaser.Scene {
     startButton.setInteractive({ useHandCursor: true });
 
     startButton.on("pointerdown", () => {
-      this.scene.start("Game");
+      this.scene.start(Scenes.GAME);
+      this.scene.launch(Scenes.UI);
     });
   }
 }

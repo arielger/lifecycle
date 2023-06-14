@@ -17,6 +17,7 @@ import {
   getDirectionFromPosition,
 } from "../utils/animations";
 import { gameConfig } from "./ui/config";
+import { GameAssets } from "../types";
 
 // Animations
 enum EPlayerAnimations {
@@ -63,6 +64,7 @@ export class PlayersManager {
         id: playerId,
         position: player.position,
         health: player.health,
+        name: player.name,
       });
       this.players.add(newPlayer);
 
@@ -153,7 +155,8 @@ export class Player extends Phaser.GameObjects.Container {
   id: string;
   playerSprite: Phaser.GameObjects.Sprite;
   body!: MatterJS.BodyType;
-  health!: number;
+  health: number;
+  name: string;
 
   // Store collision direction to prevent sending invalid player movement to the server
   collisionDirection?: Direction;
@@ -163,11 +166,13 @@ export class Player extends Phaser.GameObjects.Container {
     id,
     position,
     health,
+    name,
   }: {
     scene: Phaser.Scene;
     id: string;
     position: TVector2;
     health: number;
+    name: string;
   }) {
     super(scene, position.x, position.y, []);
     scene.add.existing(this);
@@ -202,11 +207,18 @@ export class Player extends Phaser.GameObjects.Container {
       this.collisionDirection = undefined;
     };
 
-    this.add([this.playerSprite]);
+    const playerName = scene.add
+      .bitmapText(0, -12, GameAssets.TYPOGRAPHY, name)
+      .setOrigin(0.5)
+      .setScale(0.25)
+      .setTintFill(0xffffff);
+
+    this.add([this.playerSprite, playerName]);
 
     this.health = health;
     this.scene = scene;
     this.id = id;
+    this.name = name;
   }
 
   static preloadAssets(scene: Phaser.Scene): void {

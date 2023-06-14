@@ -2,8 +2,8 @@ TODO:
 
 FEATURES
 
-- [ ] Make bigger map (to check different resolutions to fix text resolution bug + pixel art)
-- [ ] Add player name + show it below character
+- [OK] Make bigger map (to check different resolutions to fix text resolution bug + pixel art)
+- [WIP] Add player name + show it below character
 - [ ] Show amount of players in game
 - [ ] Add game log
   - [ ] Player killed x player
@@ -14,6 +14,7 @@ FEATURES
 - [ ] Add sounds
 - [ ] Add items
 - [ ] Add different types of characters
+- [ ] Add WASD for movement
 
 BUG FIXING
 
