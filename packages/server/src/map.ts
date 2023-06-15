@@ -2,7 +2,7 @@ import matter from "matter-js";
 import mapJson from "@lifecycle/common/src/modules/map/map.json";
 import { MAP_SIZE } from "@lifecycle/common/build/modules/map";
 
-import { randomInt } from "./utils";
+import { randomInt } from "@lifecycle/common/build/utils/numbers";
 import { TVector2 } from "@lifecycle/common/build/modules/math";
 
 const addWorldBounds = (world: Matter.World) => {

@@ -1,4 +1,7 @@
 import Phaser from "phaser";
+import InputText from "phaser3-rex-plugins/plugins/inputtext.js";
+
+import { randomInt } from "@lifecycle/common/build/utils/numbers";
 
 import MonogramFontPNG from "url:../assets/fonts/monogram.png";
 import MonogramFontXML from "url:../assets/fonts/monogram.xml";
@@ -12,6 +15,8 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameScene extends Phaser.Scene {
+  nameInput?: InputText;
+
   constructor() {
     super(sceneConfig);
   }
@@ -37,10 +42,27 @@ export default class GameScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setTintFill(0xffffff);
 
+    this.nameInput = new InputText(
+      this,
+      screenCenter.x,
+      screenCenter.y + 30,
+      300,
+      16,
+      {
+        text: `PLAYER_${randomInt(1, 999)}`,
+        align: "center",
+        fontSize: "16px",
+        maxLength: 14,
+      }
+    );
+    this.add.existing(this.nameInput);
+
+    this.nameInput.setFocus();
+
     const startButton = this.add
       .bitmapText(
         screenCenter.x,
-        screenCenter.y + 30,
+        screenCenter.y + 60,
         GameAssets.TYPOGRAPHY,
         "START"
       )
@@ -50,7 +72,7 @@ export default class GameScene extends Phaser.Scene {
     startButton.setInteractive({ useHandCursor: true });
 
     startButton.on("pointerdown", () => {
-      this.scene.start(Scenes.GAME);
+      this.scene.start(Scenes.GAME, { playerName: this.nameInput?.text });
       this.scene.launch(Scenes.UI);
     });
   }

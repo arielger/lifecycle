@@ -16,7 +16,6 @@ import { Direction } from "@lifecycle/common/build/types";
 
 import { getValidBodyPosition } from "./map";
 import { Monster } from "./monster";
-import { getRandom } from "@lifecycle/common/build/utils/arrays";
 
 export const getPlayersPublicData = (
   players: Record<string, Player>
@@ -45,13 +44,17 @@ export class Player {
   world: matter.World;
   players: Record<string, Player>;
 
-  constructor(world: matter.World, players: Record<string, Player>) {
+  constructor(
+    world: matter.World,
+    players: Record<string, Player>,
+    name: string
+  ) {
     this.id = uuidv4();
     this.lastProcessedInput = 0;
     this.direction = Direction.DOWN;
     this.health = PLAYER_INITIAL_HEALTH;
     this.attack = PLAYER_INITIAL_ATTACK;
-    this.name = getRandom(["jose", "mati", "chicho", "tato", "lilo", "ariel"]);
+    this.name = name;
 
     this.players = players;
     this.world = world;

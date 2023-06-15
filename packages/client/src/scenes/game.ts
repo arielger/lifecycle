@@ -68,11 +68,15 @@ export default class GameScene extends Phaser.Scene {
     preloadMapAssets(this);
   }
 
-  public create(): void {
+  public create({ playerName }: { playerName: string }): void {
     Player.loadAssets(this);
     Monster.loadAssets(this);
 
-    this.socket = io(process.env.SOCKET_SERVER_URL);
+    this.socket = io(process.env.SOCKET_SERVER_URL, {
+      query: {
+        playerName,
+      },
+    });
 
     this.playersManager = new PlayersManager({ scene: this });
     this.monstersManager = new MonstersManager({ scene: this });

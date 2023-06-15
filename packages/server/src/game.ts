@@ -22,15 +22,17 @@ type MonstersMap = Record<string, Monster>;
 function handleNewPlayerJoined({
   engine,
   socket,
+  name,
   players,
   monsters,
 }: {
   engine: Matter.Engine;
   socket: Socket<TClientToServerEvents, TServerToClientEvents>;
+  name: string;
   players: PlayerMap;
   monsters: MonstersMap;
 }) {
-  const player = new Player(engine.world, players);
+  const player = new Player(engine.world, players, name);
 
   // Add new player to player list
   players[player.id] = player;
@@ -98,9 +100,13 @@ export function startGame(
   });
 
   io.on("connection", (socket) => {
+    const newPlayerName =
+      (socket.handshake.query?.playerName as string) ?? "RANDOM_PLAYER";
+
     let player = handleNewPlayerJoined({
       engine,
       socket,
+      name: newPlayerName,
       players,
       monsters,
     });
@@ -124,6 +130,7 @@ export function startGame(
       player = handleNewPlayerJoined({
         engine,
         socket,
+        name: newPlayerName,
         players,
         monsters,
       });

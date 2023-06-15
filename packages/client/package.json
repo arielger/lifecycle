@@ -25,6 +25,7 @@
     "@types/dat.gui": "^0.7.9",
     "dat.gui": "^0.7.9",
     "phaser": "3.55.2",
+    "phaser3-rex-plugins": "^1.60.2",
     "socket.io-client": "^4.1.3"
   }
 }

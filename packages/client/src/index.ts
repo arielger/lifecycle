@@ -23,6 +23,11 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   scene: [MenuScene, GameScene, UIScene],
   pixelArt: true,
+  dom: {
+    // required for inputtext-plugin
+    // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/inputtext/#import-class
+    createContainer: true,
+  },
 };
 
 new Phaser.Game(config);
