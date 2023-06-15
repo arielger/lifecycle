@@ -31,6 +31,8 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 export enum GameSceneEvents {
   INITIALIZE_HEALTHBAR = "INITIALIZE_HEALTHBAR",
   UPDATE_HEALTH_VALUE = "UPDATE_HEALTH_VALUE",
+  INITIALIZE_PLAYER_COUNT = "INITIALIZE_PLAYER_COUNT",
+  UPDATE_PLAYER_COUNT = "UPDATE_PLAYER_COUNT",
 }
 
 export default class GameScene extends Phaser.Scene {
@@ -116,6 +118,10 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
 
         this.events.emit(GameSceneEvents.INITIALIZE_HEALTHBAR);
+        this.events.emit(
+          GameSceneEvents.INITIALIZE_PLAYER_COUNT,
+          Object.keys(update.players).length
+        );
       } else if (update.type === "GAME_STATE") {
         // @TODO: Review => we should be sending deltas of game state
         this.playersManager?.updatePlayers({
@@ -169,8 +175,16 @@ export default class GameScene extends Phaser.Scene {
         }
       } else if (update.type === "PLAYER_JOINED") {
         this.playersManager?.addPlayer(update.playerId, update.player);
+        this.events.emit(
+          GameSceneEvents.UPDATE_PLAYER_COUNT,
+          this.playersManager!.players.getLength()
+        );
       } else if (update.type === "PLAYER_LEFT") {
         this.playersManager?.removePlayer(update.playerId);
+        this.events.emit(
+          GameSceneEvents.UPDATE_PLAYER_COUNT,
+          this.playersManager!.players.getLength()
+        );
       }
     });
   }

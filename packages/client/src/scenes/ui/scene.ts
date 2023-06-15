@@ -3,6 +3,7 @@ import { PLAYER_INITIAL_HEALTH } from "@lifecycle/common/src/modules/player";
 import { Scenes } from "../../types";
 import { GameSceneEvents } from "../game";
 import { HealthBarUI } from "./healthbar";
+import { PlayerCountUI } from "./player-count";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   key: Scenes.UI,
@@ -12,6 +13,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 
 export default class UIScene extends Phaser.Scene {
   private healthBarUI?: HealthBarUI;
+  private playerCountUI?: PlayerCountUI;
 
   constructor() {
     super(sceneConfig);
@@ -38,6 +40,23 @@ export default class UIScene extends Phaser.Scene {
       GameSceneEvents.UPDATE_HEALTH_VALUE,
       (health: number) => {
         this.healthBarUI?.updateHealth(health);
+      }
+    );
+
+    gameScene.events.on(
+      GameSceneEvents.INITIALIZE_PLAYER_COUNT,
+      (playerCount: number) => {
+        this.playerCountUI = new PlayerCountUI({
+          scene: this,
+          playerCount,
+        });
+      }
+    );
+
+    gameScene.events.on(
+      GameSceneEvents.UPDATE_PLAYER_COUNT,
+      (playerCount: number) => {
+        this.playerCountUI?.updatePlayerCount(playerCount);
       }
     );
   }
