@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import InputText from "phaser3-rex-plugins/plugins/inputtext.js";
 
-import { randomInt } from "@lifecycle/common/build/utils/numbers";
+import { randomInt } from "@lifecycle/common/src/utils/numbers";
 
 import MonogramFontPNG from "url:../assets/fonts/monogram.png";
 import MonogramFontXML from "url:../assets/fonts/monogram.xml";
