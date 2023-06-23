@@ -42,8 +42,6 @@ export class ChatUI {
           cellContainer = createCellContainer(scene).setOrigin(0);
         }
 
-        console.log("cellContainer", cellContainer);
-
         cellContainer.setMinWidth(cell.width);
         cellContainer.getElement("content").setText(cell.item.content);
 

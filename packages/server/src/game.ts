@@ -116,6 +116,7 @@ export function startGame(
       socket.broadcast.emit(ESocketEventNames.GameUpdate, {
         type: "PLAYER_LEFT",
         playerId: player.id,
+        player: player.getPublicData(),
       });
     });
 

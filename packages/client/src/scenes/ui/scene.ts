@@ -33,7 +33,11 @@ export default class UIScene extends Phaser.Scene {
     });
 
     gameScene.events.on(GameSceneEvents.PLAYER_JOINED, (playerName: string) => {
-      this.chatUI.addMessage(`${playerName} joined the game`);
+      this.chatUI?.addMessage(`${playerName} joined the game`);
+    });
+
+    gameScene.events.on(GameSceneEvents.PLAYER_LEFT, (playerName: string) => {
+      this.chatUI?.addMessage(`${playerName} left the game`);
     });
 
     gameScene.events.on(GameSceneEvents.INITIALIZE_HEALTHBAR, () => {

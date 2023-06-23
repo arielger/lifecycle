@@ -33,8 +33,10 @@ export enum GameSceneEvents {
   UPDATE_HEALTH_VALUE = "UPDATE_HEALTH_VALUE",
   INITIALIZE_PLAYER_COUNT = "INITIALIZE_PLAYER_COUNT",
   UPDATE_PLAYER_COUNT = "UPDATE_PLAYER_COUNT",
+
   // Chat
   PLAYER_JOINED = "PLAYER_JOINED",
+  PLAYER_LEFT = "PLAYER_LEFT",
 }
 
 export default class GameScene extends Phaser.Scene {
@@ -183,6 +185,7 @@ export default class GameScene extends Phaser.Scene {
           this.playersManager!.players.getLength()
         );
       } else if (update.type === "PLAYER_LEFT") {
+        this.events.emit(GameSceneEvents.PLAYER_LEFT, update.player.name);
         this.playersManager?.removePlayer(update.playerId);
         this.events.emit(
           GameSceneEvents.UPDATE_PLAYER_COUNT,

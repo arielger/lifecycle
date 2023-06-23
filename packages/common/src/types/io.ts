@@ -31,6 +31,7 @@ export type TServerToClientEvents = {
       | {
           type: "PLAYER_LEFT";
           playerId: string;
+          player: TPlayer;
         }
       | {
           type: "GAME_STATE";
