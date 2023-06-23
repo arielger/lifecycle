@@ -137,6 +137,7 @@ export class PlayersManager {
       id: playerId,
       position: player.position,
       health: player.health,
+      name: player.name,
     });
     this.players.add(newPlayer);
   }

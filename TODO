@@ -5,6 +5,7 @@ FEATURES
 - [OK] Make bigger map (to check different resolutions to fix text resolution bug + pixel art)
 - [OK] Add player name + show it below character
 - [OK] Show amount of players in game
+- [OK] Show name of other players
 - [ ] Add game log
   - [OK] Player joined the game
   - [ ] Player killed x player
