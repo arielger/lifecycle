@@ -14,7 +14,7 @@ import {
 import { MAP_SIZE } from "@lifecycle/common/src/modules/map";
 import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
 
-import { resolution } from "../config";
+import { resolution } from "../resolution";
 import { Player, PlayersManager } from "./player";
 import { Monster, MonstersManager } from "./monster";
 import { preloadMapAssets, createMap } from "./map";
@@ -33,6 +33,8 @@ export enum GameSceneEvents {
   UPDATE_HEALTH_VALUE = "UPDATE_HEALTH_VALUE",
   INITIALIZE_PLAYER_COUNT = "INITIALIZE_PLAYER_COUNT",
   UPDATE_PLAYER_COUNT = "UPDATE_PLAYER_COUNT",
+  // Chat
+  PLAYER_JOINED = "PLAYER_JOINED",
 }
 
 export default class GameScene extends Phaser.Scene {
@@ -174,6 +176,7 @@ export default class GameScene extends Phaser.Scene {
           this.pendingInputs = [];
         }
       } else if (update.type === "PLAYER_JOINED") {
+        this.events.emit(GameSceneEvents.PLAYER_JOINED, update.player.name);
         this.playersManager?.addPlayer(update.playerId, update.player);
         this.events.emit(
           GameSceneEvents.UPDATE_PLAYER_COUNT,

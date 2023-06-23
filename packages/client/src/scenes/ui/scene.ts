@@ -4,6 +4,7 @@ import { Scenes } from "../../types";
 import { GameSceneEvents } from "../game";
 import { HealthBarUI } from "./healthbar";
 import { PlayerCountUI } from "./player-count";
+import { ChatUI } from "./chat";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   key: Scenes.UI,
@@ -14,6 +15,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 export default class UIScene extends Phaser.Scene {
   private healthBarUI?: HealthBarUI;
   private playerCountUI?: PlayerCountUI;
+  private chatUI?: ChatUI;
 
   constructor() {
     super(sceneConfig);
@@ -25,6 +27,14 @@ export default class UIScene extends Phaser.Scene {
 
   public create(): void {
     const gameScene = this.scene.get(Scenes.GAME);
+
+    this.chatUI = new ChatUI({
+      scene: this,
+    });
+
+    gameScene.events.on(GameSceneEvents.PLAYER_JOINED, (playerName: string) => {
+      this.chatUI.addMessage(`${playerName} joined the game`);
+    });
 
     gameScene.events.on(GameSceneEvents.INITIALIZE_HEALTHBAR, () => {
       // If game is restarting we shouldn't initialize the healthbar again
