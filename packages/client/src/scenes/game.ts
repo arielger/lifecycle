@@ -9,6 +9,7 @@ import {
 import {
   ECursorKey,
   getPlayerVelocity,
+  PLAYER_ATTACK_COOLDOWN,
   TPlayerInput,
 } from "@lifecycle/common/src/modules/player";
 import { MAP_SIZE } from "@lifecycle/common/src/modules/map";
@@ -200,8 +201,17 @@ export default class GameScene extends Phaser.Scene {
 
     const keys: ECursorKey[] = [];
 
-    // Movement handling
-    if (this.cursorKeys?.up.isDown) {
+    const isAttacking =
+      this.player.lastAttackTimestamp + PLAYER_ATTACK_COOLDOWN >= Date.now();
+
+    // Disable all actions if player is already attacking (to avoid movement while attacking)
+    if (isAttacking) return;
+
+    if (Phaser.Input.Keyboard.JustDown(this.keySpace)) {
+      // Attack handling
+      this.player.lastAttackTimestamp = Date.now();
+      keys.push(ECursorKey.SPACE);
+    } else if (this.cursorKeys?.up.isDown) {
       keys.push(ECursorKey.UP);
     } else if (this.cursorKeys?.down.isDown) {
       keys.push(ECursorKey.DOWN);
@@ -209,11 +219,6 @@ export default class GameScene extends Phaser.Scene {
       keys.push(ECursorKey.LEFT);
     } else if (this.cursorKeys?.right.isDown) {
       keys.push(ECursorKey.RIGHT);
-    }
-
-    // Attack handling
-    if (Phaser.Input.Keyboard.JustDown(this.keySpace)) {
-      keys.push(ECursorKey.SPACE);
     }
 
     this.player.update({ keys, delta });

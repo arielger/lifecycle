@@ -6,11 +6,11 @@ FEATURES
 - [OK] Add player name + show it below character
 - [OK] Show amount of players in game
 - [OK] Show name of other players
-- [ ] Add game log
-  - [OK] Player joined the game
-  - [ ] Player killed x player
-- [] Show other players and monsters life (small health bar)
-- [ ] Add attack cooldown (client + server)
+- [OK] Add attack cooldown (client side)
+- [ ] Add attack cooldown (server side)
+- [ ] Add game log -> player joined the game
+- [ ] Add game log -> Player killed other player
+- [ ] Show other players and monsters life (small health bar)
 - [ ] Review client side prediction (there are still some weird movements not involving collisions)
 - [ ] Add entity interpolation
 - [ ] Add chat

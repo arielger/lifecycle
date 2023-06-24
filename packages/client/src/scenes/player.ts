@@ -5,6 +5,7 @@ import {
   getPlayerVelocity,
   ECursorKey,
   EPlayerAction,
+  PLAYER_ATTACK_COOLDOWN,
 } from "@lifecycle/common/src/modules/player";
 import { Direction } from "@lifecycle/common/src/types";
 import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
@@ -159,6 +160,9 @@ export class Player extends Phaser.GameObjects.Container {
   health: number;
   name: string;
 
+  // Substract attack cooldown to allow player to attack immediately
+  lastAttackTimestamp: number = Date.now() - PLAYER_ATTACK_COOLDOWN;
+
   // Store collision direction to prevent sending invalid player movement to the server
   collisionDirection?: Direction;
 
@@ -271,7 +275,7 @@ export class Player extends Phaser.GameObjects.Container {
       frames: scene.anims.generateFrameNumbers("skeleton", {
         frames: [16],
       }),
-      duration: 300,
+      duration: PLAYER_ATTACK_COOLDOWN,
       repeat: 0,
     });
 
@@ -280,7 +284,7 @@ export class Player extends Phaser.GameObjects.Container {
       frames: scene.anims.generateFrameNumbers("skeleton", {
         frames: [17],
       }),
-      duration: 300,
+      duration: PLAYER_ATTACK_COOLDOWN,
       repeat: 0,
     });
 
@@ -289,7 +293,7 @@ export class Player extends Phaser.GameObjects.Container {
       frames: scene.anims.generateFrameNumbers("skeleton", {
         frames: [18],
       }),
-      duration: 300,
+      duration: PLAYER_ATTACK_COOLDOWN,
       repeat: 0,
     });
 
@@ -298,7 +302,7 @@ export class Player extends Phaser.GameObjects.Container {
       frames: scene.anims.generateFrameNumbers("skeleton", {
         frames: [19],
       }),
-      duration: 300,
+      duration: PLAYER_ATTACK_COOLDOWN,
       repeat: 0,
     });
 
