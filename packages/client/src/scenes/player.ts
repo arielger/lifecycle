@@ -11,7 +11,7 @@ import { Direction } from "@lifecycle/common/src/types";
 import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
 
 import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
-import shadowImage from "url:../assets/characters/shadow-2.png";
+import shadowImage from "url:../assets/characters/shadow.png";
 
 import {
   getDirectionFromAnimation,
