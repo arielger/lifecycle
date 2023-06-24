@@ -11,6 +11,7 @@ import { Direction } from "@lifecycle/common/src/types";
 import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
 
 import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
+import shadowImage from "url:../assets/characters/shadow-2.png";
 
 import {
   getDirectionFromAnimation,
@@ -19,6 +20,11 @@ import {
 } from "../utils/animations";
 import { gameConfig } from "./ui/config";
 import { GameAssets } from "../types";
+
+enum PlayerAssets {
+  PLAYER_SPRITES = "playerSprites",
+  PLAYER_SHADOW = "playerShadow",
+}
 
 // Animations
 enum EPlayerAnimations {
@@ -182,7 +188,7 @@ export class Player extends Phaser.GameObjects.Container {
     super(scene, position.x, position.y, []);
     scene.add.existing(this);
 
-    this.playerSprite = scene.add.sprite(0, 0, "skeleton");
+    this.playerSprite = scene.add.sprite(0, 0, PlayerAssets.PLAYER_SPRITES);
     this.playerSprite.anims.play(EPlayerAnimations.WALK_DOWN);
     resetAnimationAndStop(this.playerSprite);
 
@@ -218,7 +224,14 @@ export class Player extends Phaser.GameObjects.Container {
       .setScale(0.25)
       .setTintFill(0xffffff);
 
-    this.add([this.playerSprite, playerName]);
+    const playerShadow = scene.add
+      .image(0.5, 7, PlayerAssets.PLAYER_SHADOW)
+      .setOrigin(0.5)
+      .setAlpha(0.75);
+
+    this.add([this.playerSprite, playerName, playerShadow]);
+
+    this.sendToBack(playerShadow);
 
     this.health = health;
     this.scene = scene;
@@ -227,16 +240,18 @@ export class Player extends Phaser.GameObjects.Container {
   }
 
   static preloadAssets(scene: Phaser.Scene): void {
-    scene.load.spritesheet("skeleton", skeletonSpritesheet, {
+    scene.load.spritesheet(PlayerAssets.PLAYER_SPRITES, skeletonSpritesheet, {
       frameWidth: 16,
       frameHeight: 16,
     });
+
+    scene.load.image(PlayerAssets.PLAYER_SHADOW, shadowImage);
   }
 
   static loadAssets(scene: Phaser.Scene): void {
     scene.anims.create({
       key: EPlayerAnimations.WALK_DOWN,
-      frames: scene.anims.generateFrameNumbers("skeleton", {
+      frames: scene.anims.generateFrameNumbers(PlayerAssets.PLAYER_SPRITES, {
         frames: [0, 4, 8, 12],
       }),
       frameRate: 8,
@@ -245,7 +260,7 @@ export class Player extends Phaser.GameObjects.Container {
 
     scene.anims.create({
       key: EPlayerAnimations.WALK_UP,
-      frames: scene.anims.generateFrameNumbers("skeleton", {
+      frames: scene.anims.generateFrameNumbers(PlayerAssets.PLAYER_SPRITES, {
         frames: [1, 5, 9, 13],
       }),
       frameRate: 8,
@@ -254,7 +269,7 @@ export class Player extends Phaser.GameObjects.Container {
 
     scene.anims.create({
       key: EPlayerAnimations.WALK_LEFT,
-      frames: scene.anims.generateFrameNumbers("skeleton", {
+      frames: scene.anims.generateFrameNumbers(PlayerAssets.PLAYER_SPRITES, {
         frames: [2, 6, 10, 14],
       }),
       frameRate: 8,
@@ -263,7 +278,7 @@ export class Player extends Phaser.GameObjects.Container {
 
     scene.anims.create({
       key: EPlayerAnimations.WALK_RIGHT,
-      frames: scene.anims.generateFrameNumbers("skeleton", {
+      frames: scene.anims.generateFrameNumbers(PlayerAssets.PLAYER_SPRITES, {
         frames: [3, 7, 11, 15],
       }),
       frameRate: 8,
@@ -272,7 +287,7 @@ export class Player extends Phaser.GameObjects.Container {
 
     scene.anims.create({
       key: EPlayerAnimations.ATTACK_DOWN,
-      frames: scene.anims.generateFrameNumbers("skeleton", {
+      frames: scene.anims.generateFrameNumbers(PlayerAssets.PLAYER_SPRITES, {
         frames: [16],
       }),
       duration: PLAYER_ATTACK_COOLDOWN,
@@ -281,7 +296,7 @@ export class Player extends Phaser.GameObjects.Container {
 
     scene.anims.create({
       key: EPlayerAnimations.ATTACK_UP,
-      frames: scene.anims.generateFrameNumbers("skeleton", {
+      frames: scene.anims.generateFrameNumbers(PlayerAssets.PLAYER_SPRITES, {
         frames: [17],
       }),
       duration: PLAYER_ATTACK_COOLDOWN,
@@ -290,7 +305,7 @@ export class Player extends Phaser.GameObjects.Container {
 
     scene.anims.create({
       key: EPlayerAnimations.ATTACK_LEFT,
-      frames: scene.anims.generateFrameNumbers("skeleton", {
+      frames: scene.anims.generateFrameNumbers(PlayerAssets.PLAYER_SPRITES, {
         frames: [18],
       }),
       duration: PLAYER_ATTACK_COOLDOWN,
@@ -299,7 +314,7 @@ export class Player extends Phaser.GameObjects.Container {
 
     scene.anims.create({
       key: EPlayerAnimations.ATTACK_RIGHT,
-      frames: scene.anims.generateFrameNumbers("skeleton", {
+      frames: scene.anims.generateFrameNumbers(PlayerAssets.PLAYER_SPRITES, {
         frames: [19],
       }),
       duration: PLAYER_ATTACK_COOLDOWN,
@@ -308,7 +323,7 @@ export class Player extends Phaser.GameObjects.Container {
 
     scene.anims.create({
       key: EPlayerAnimations.DEAD,
-      frames: scene.anims.generateFrameNumbers("skeleton", {
+      frames: scene.anims.generateFrameNumbers(PlayerAssets.PLAYER_SPRITES, {
         frames: [24],
       }),
     });

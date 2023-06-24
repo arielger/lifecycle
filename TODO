@@ -7,13 +7,14 @@ FEATURES
 - [OK] Show amount of players in game
 - [OK] Show name of other players
 - [OK] Add attack cooldown (client side)
+- [OK] Add game log -> player joined the game / left the game
+- [OK] Add character shadow
 - [ ] Add attack cooldown (server side)
-- [ ] Add game log -> player joined the game
 - [ ] Add game log -> Player killed other player
 - [ ] Show other players and monsters life (small health bar)
 - [ ] Review client side prediction (there are still some weird movements not involving collisions)
 - [ ] Add entity interpolation
-- [ ] Add chat
+- [ ] Game log -> Send messages
 - [ ] Add sounds
 - [ ] Add items
 - [ ] Add different types of characters
