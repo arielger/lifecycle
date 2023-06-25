@@ -6,12 +6,14 @@ import {
   ECursorKey,
   EPlayerAction,
   PLAYER_ATTACK_COOLDOWN,
+  PLAYER_INITIAL_HEALTH,
 } from "@lifecycle/common/src/modules/player";
 import { Direction } from "@lifecycle/common/src/types";
 import { getDirectionFromInputKeys } from "@lifecycle/common/src/utils/input";
 
 import skeletonSpritesheet from "url:../assets/characters/skeleton.png";
 import shadowImage from "url:../assets/characters/shadow.png";
+import healthbarImage from "url:../assets/characters/health-bar.png";
 
 import {
   getDirectionFromAnimation,
@@ -24,6 +26,7 @@ import { GameAssets } from "../types";
 enum PlayerAssets {
   PLAYER_SPRITES = "playerSprites",
   PLAYER_SHADOW = "playerShadow",
+  HEALTHBAR = "healthbar",
 }
 
 // Animations
@@ -106,7 +109,7 @@ export class PlayersManager {
           player.hit();
         }
 
-        player.health = playerUpdate.health;
+        player.updateHealth(playerUpdate.health);
 
         // Only update animations for other players (current player animation is already handled)
         if (!isCurrentPlayer) {
@@ -124,7 +127,7 @@ export class PlayersManager {
       } else {
         if (isCurrentPlayer) {
           // Update health UI
-          player.health = 0;
+          player.updateHealth(0);
 
           player?.playerSprite.play(EPlayerAnimations.DEAD);
 
@@ -162,6 +165,7 @@ export class Player extends Phaser.GameObjects.Container {
   scene: Phaser.Scene;
   id: string;
   playerSprite: Phaser.GameObjects.Sprite;
+  healthBarFill: Phaser.GameObjects.Rectangle;
   body!: MatterJS.BodyType;
   health: number;
   name: string;
@@ -219,17 +223,31 @@ export class Player extends Phaser.GameObjects.Container {
     };
 
     const playerName = scene.add
-      .bitmapText(0, -12, GameAssets.TYPOGRAPHY, name)
+      .bitmapText(0, -20, GameAssets.TYPOGRAPHY, name)
       .setOrigin(0.5)
       .setScale(0.25)
       .setTintFill(0xffffff);
+
+    const healthbarContainer = scene.add.container(0, -14);
+    const playerHealthbar = scene.add.image(0, 0, PlayerAssets.HEALTHBAR);
+    this.healthBarFill = scene.add
+      .rectangle(
+        -8,
+        -0,
+        16,
+        2,
+        Phaser.Display.Color.ValueToColor("E0394C").color
+      )
+      .setOrigin(0, 0.5);
+
+    healthbarContainer.add([playerHealthbar, this.healthBarFill]);
 
     const playerShadow = scene.add
       .image(0.5, 7, PlayerAssets.PLAYER_SHADOW)
       .setOrigin(0.5)
       .setAlpha(0.75);
 
-    this.add([this.playerSprite, playerName, playerShadow]);
+    this.add([this.playerSprite, playerName, playerShadow, healthbarContainer]);
 
     this.sendToBack(playerShadow);
 
@@ -246,6 +264,8 @@ export class Player extends Phaser.GameObjects.Container {
     });
 
     scene.load.image(PlayerAssets.PLAYER_SHADOW, shadowImage);
+
+    scene.load.image(PlayerAssets.HEALTHBAR, healthbarImage);
   }
 
   static loadAssets(scene: Phaser.Scene): void {
@@ -392,6 +412,11 @@ export class Player extends Phaser.GameObjects.Container {
       resetAnimationAndStop(this.playerSprite);
       return;
     }
+  }
+
+  updateHealth(health: number): void {
+    this.health = health;
+    this.healthBarFill.displayWidth = (health / PLAYER_INITIAL_HEALTH) * 16;
   }
 
   hit(): void {

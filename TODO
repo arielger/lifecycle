@@ -9,9 +9,12 @@ FEATURES
 - [OK] Add attack cooldown (client side)
 - [OK] Add game log -> player joined the game / left the game
 - [OK] Add character shadow
+- [OK] Show other players health
+- [WIP] Show monsters health
 - [ ] Add attack cooldown (server side)
 - [ ] Add game log -> Player killed other player
-- [ ] Show other players and monsters life (small health bar)
+- [ ] Enable movement in diagonal
+- [ ] Add attack animation
 - [ ] Review client side prediction (there are still some weird movements not involving collisions)
 - [ ] Add entity interpolation
 - [ ] Game log -> Send messages
